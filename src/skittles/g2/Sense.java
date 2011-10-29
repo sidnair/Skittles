@@ -1,7 +1,13 @@
 package skittles.g2;
 
-public interface Sense {
+public class Sense {
 	
-	boolean hoardColor(int color);
+	public static boolean hoardColor(int color) {
+		return true;
+	}
+	
+	public double findHappinessForSkittle(double happiness, int count) {
+		return (happiness / (Math.sqrt(count * 1.0)));
+	}
 
 }
