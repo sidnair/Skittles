@@ -6,7 +6,7 @@
 	</Game>
 
 	<Player>
-		<Class>skittles.dumpplayer.DumpPlayer</Class>
+		<Class>skittles.g2.Ebenezer</Class>
 		<Happiness>random,5</Happiness>
 		<InHand>random</InHand>
 	</Player>

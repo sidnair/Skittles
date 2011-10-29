@@ -6,10 +6,19 @@ public class Skittle {
 	private int count;
 	private double value;
 	private static int skittlesLeft = 0;
+	private int color;
+	public static final double UNDEFINED_VALUE = -2.0;
 		
-	public Skittle(int count) {
+	public Skittle(int count, int color) {
 		this.count = count;
+		Skittle.skittlesLeft += count;
 		this.tasted = false;
+		this.color = color;
+		this.value = UNDEFINED_VALUE;
+	}
+	
+	public int getColor() {
+		return color;
 	}
 	
 	public void setValue(double value) {
@@ -24,28 +33,37 @@ public class Skittle {
 		return count;
 	}
 	
-	public void setCount(int count) {
-		this.count = count;
+	public void incCount(int incrementBy) {
+		this.count += incrementBy;
+		Skittle.skittlesLeft += incrementBy;
+	}
+	
+	public void decCount(int decrementBy) {
+		this.count -= decrementBy;
+		Skittle.skittlesLeft -= decrementBy;
 	}
 	
 	public boolean getTasted() {
 		return tasted;
 	}
 	
-	public void setTasted(boolean tasted) {
-		this.tasted = tasted;
+	public void setTasted() {
+		this.tasted = true;
 	}
-	
-	public static void incSkittlesCount(int incrementBy) {
-		Skittle.skittlesLeft += incrementBy;
-	}
-	
-	public static void decSkittlesCount(int decrementBy) {
-		Skittle.skittlesLeft -= decrementBy;
-	}
-	
+		
 	public static int getSkittlesLeft() {
 		return skittlesLeft;
+	}
+	
+	public String toString() {
+		String ret = "[color: " + color + ", (count: " + count + "), ";
+		if (this.value != UNDEFINED_VALUE) {
+			ret += "(value: " + this.value + ")";
+		} else {
+			ret += "(value: unknown)";
+		}
+		ret += "]";
+		return ret;
 	}
 	
 	

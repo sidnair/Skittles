@@ -6,36 +6,49 @@ import java.util.PriorityQueue;
 
 import skittles.sim.Offer;
 import skittles.sim.Player;
+import skittles.sim.Skittles;
 
 public class Ebenezer extends Player {
+	
+	public static final boolean DEBUG = true;
 	
 	Skittle[] rainbow;
 	double dblHappiness;
 	String strClassName;
 	int intPlayerIndex;
-	Sense mySense; //Initialize this
+	Mouth myMouth;
 	
 	SkittleComparator comparator = new SkittleComparator();
-	PriorityQueue<Skittle> unknownSkittleQueue = new PriorityQueue<Skittle>(10, comparator);
+	PriorityQueue<Skittle> unknownSkittleQueue;
 		
 	@Override
 	public void initialize(int intPlayerIndex, String strClassName, int[] aintInHand) {
+		System.out.println(Ebenezer.class.toString() + " is index: " + intPlayerIndex);
+		unknownSkittleQueue = new PriorityQueue<Skittle>(10, comparator);
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
 		rainbow = new Skittle[aintInHand.length];
 		for (int i = 0; i < rainbow.length; i++) {
-			rainbow[i] = new Skittle(aintInHand[i]);
-			Skittle.incSkittlesCount(aintInHand[i]);
-			unknownSkittleQueue.add(rainbow[i]);
+			rainbow[i] = new Skittle(aintInHand[i], i);
+			if (aintInHand[i] > 0) {
+				unknownSkittleQueue.add(rainbow[i]);
+			}
 		}
-		dblHappiness = 0;
+		myMouth = new Mouth();
+		dblHappiness = 0; 
 	}
 
 	@Override
 	public void eat(int[] aintTempEat) {
+		Skittle toEat;
 		if (!unknownSkittleQueue.isEmpty()) {
-			unknownSkittleQueue.remove();
+			toEat = unknownSkittleQueue.remove();
+			aintTempEat[toEat.getColor()] = 1;
+			toEat.decCount(1);
+			myMouth.skittleInMouth = toEat;
+			myMouth.howMany = 1;
 		}
+		//No more unknowns to try
 	}
 
 	@Override
@@ -45,7 +58,8 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void happier(double dblHappinessUp) {
-		// TODO Auto-generated method stub
+		this.dblHappiness += dblHappinessUp;
+		
 	}
 
 	@Override
@@ -88,16 +102,20 @@ public class Ebenezer extends Player {
 	    @Override
 	    public int compare(Skittle x, Skittle y)
 	    {
-	        if (x.getCount() < y.getCount())
+	        if (x.getCount() > y.getCount())
 	        {
 	            return -1;
 	        }
-	        if (x.getCount() > y.getCount())
+	        if (x.getCount() < y.getCount())
 	        {
 	            return 1;
 	        }
 	        return 0;
 	    }
 	}
-
+	
+	public class Mouth {
+		public Skittle skittleInMouth;
+		public int howMany;
+	}
 }

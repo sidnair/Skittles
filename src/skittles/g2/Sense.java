@@ -1,7 +1,9 @@
 package skittles.g2;
 
-public interface Sense {
+public class Sense {
 	
-	boolean hoardColor(int color);
+	public static boolean hoardColor(int color) {
+		return true;
+	}
 
 }
