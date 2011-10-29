@@ -41,7 +41,6 @@ public class Ebenezer extends Player {
 	@Override
 	public void offer(Offer offTemp) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
