@@ -1,6 +1,5 @@
 package skittles.sim;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +13,6 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import skittles.g2.G2Player;
 import skittles.manualplayer.ManualP;
 
 public class Game 
@@ -261,7 +259,7 @@ public class Game
 				alCurrentOffers.add( offTemp );
 				continue;
 			}
-			aplyPlayers[ intPlayerIndex ].eatAndOffer( aintTempEat, offTemp );
+			aplyPlayers[ intPlayerIndex ].eat( aintTempEat );
 			// process eat
 			if ( aplsPlayerStatus[ intPlayerIndex ].checkCanEat( aintTempEat ) )
 			{
@@ -274,6 +272,7 @@ public class Game
 				System.out.println( "Player #" + intPlayerIndex + ": You cannot eat these. Take them out of your mouth!" );
 			}
 			// process offer
+			aplyPlayers[ intPlayerIndex ].offer( offTemp );
 			if ( aplsPlayerStatus[ intPlayerIndex ].checkValidOffer( offTemp ) )
 			{
 				alCurrentOffers.add( offTemp );
@@ -290,7 +289,6 @@ public class Game
 		System.out.println( "Skittles consumption:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
-
 			System.out.print( "Player #" + intPlayerIndex + ": [ " );
 			String strInHand = "";
 			int[] aintInHand = alEats.get( intPlayerIndex );
