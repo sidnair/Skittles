@@ -48,5 +48,4 @@ public class Skittle {
 		return skittlesLeft;
 	}
 	
-	
 }
