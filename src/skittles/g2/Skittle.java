@@ -8,6 +8,7 @@ public class Skittle {
 	private static int skittlesLeft = 0;
 	private int color;
 	public static final double UNDEFINED_VALUE = -2.0;
+	int index;
 		
 	public Skittle(int count, int color) {
 		this.count = count;
@@ -15,6 +16,11 @@ public class Skittle {
 		this.tasted = false;
 		this.color = color;
 		this.value = UNDEFINED_VALUE;
+		this.index = color;
+	}
+	
+	public int getIndex() {
+		return this.index;
 	}
 	
 	public int getColor() {
@@ -43,7 +49,7 @@ public class Skittle {
 		Skittle.skittlesLeft -= decrementBy;
 	}
 	
-	public boolean getTasted() {
+	public boolean isTasted() {
 		return tasted;
 	}
 	

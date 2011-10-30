@@ -1,10 +1,11 @@
 
 package skittles.g2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
-import java.util.Random;
-
 import skittles.sim.Offer;
 import skittles.sim.Player;
 
@@ -12,25 +13,25 @@ public class Ebenezer extends Player {
 	
 	public static final boolean DEBUG = true;
 	
-	Skittle[] rainbow;
-	double dblHappiness;
-	String strClassName;
-	int intPlayerIndex;
-	Mouth myMouth;
-	Sense mySense;
+	private Skittle[] rainbow;
+	private String strClassName;
+	private int intPlayerIndex;
+	private Mouth myMouth;
+	private Sense mySense;
 	
-	SkittleComparatorByCount comparatorByCount = new SkittleComparatorByCount();
-	SkittleComparatorByValue comparatorByValue = new SkittleComparatorByValue();
-	PriorityQueue<Skittle> skittlesToTry;
-	PriorityQueue<Skittle> knownSkittleQueue;
+	private SkittleComparatorByCount comparatorByCount = new SkittleComparatorByCount();
+	private SkittleComparatorByValue comparatorByValue = new SkittleComparatorByValue();
+	private PriorityQueue<Skittle> skittlesToTry;
+	private PriorityQueue<Skittle> knownSkittleQueue;
+	private KnowledgeBase kb;
 		
 	@Override
 	public void initialize(int intPlayerIndex, String strClassName, int[] aintInHand) {
-		System.out.println(Ebenezer.class.toString() + " is index: " + intPlayerIndex);
-		skittlesToTry = new PriorityQueue<Skittle>(10, comparatorByCount);
-		knownSkittleQueue = new PriorityQueue<Skittle>(10, comparatorByValue);
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
+		skittlesToTry = new PriorityQueue<Skittle>(10, comparatorByCount);
+		knownSkittleQueue = new PriorityQueue<Skittle>(10, comparatorByValue);
+
 		rainbow = new Skittle[aintInHand.length];
 		for (int i = 0; i < rainbow.length; i++) {
 			rainbow[i] = new Skittle(aintInHand[i], i);
@@ -39,12 +40,12 @@ public class Ebenezer extends Player {
 			}
 		}
 		myMouth = new Mouth();
-		mySense = new Sense();
-		dblHappiness = 0; 
+		mySense = new Sense(); 
 	}
 
 	@Override
 	public void eat(int[] aintTempEat) {
+		// TODO - this sometimes returns an invalid choice
 		Skittle toEat = null;
 		if (Skittle.getSkittlesLeft() <= 0) {
 			return;
@@ -60,6 +61,8 @@ public class Ebenezer extends Player {
 		}
 		//All unknowns were eaten
 		while (toEat == null) {
+			// TODO - sometimesk nownSkittleQueue gets to be size 0, and peek
+			// returns null...
 			if (knownSkittleQueue.peek().getCount() > 0) {
 				toEat = knownSkittleQueue.peek();
 				aintTempEat[toEat.getColor()] = 1;
@@ -77,50 +80,62 @@ public class Ebenezer extends Player {
 		}
 	}
 
-	@Override
 	public void offer(Offer offTemp) {
-		System.out.println("Calculating Offer");
 		if (knownSkittleQueue.isEmpty()) {
 			return;
 		}
 		
-		Skittle leastFavorite = rainbow[0];
-		Skittle mostFavorite = rainbow[0];
-		
+		ArrayList<Skittle> skittles = new ArrayList<Skittle>();
 		for (Skittle s : rainbow) {
-			if (s.getTasted() && s.getCount() > 0) {
-				leastFavorite = s;
-				mostFavorite = s;
-				break;
+			if (s.isTasted()) {
+				skittles.add(s);
 			}
 		}
-		
-		for (Skittle s : rainbow) {
-			System.out.println(s);
-			if (s.getTasted() && s.getCount() > 0) {
-				if (s.getValue() < leastFavorite.getValue()) {
-					leastFavorite = s;
+		Collections.sort(skittles, new Comparator<Skittle>() {
+			@Override
+			public int compare(Skittle first, Skittle second) {
+				double diff = first.getValue() - second.getValue();
+				if (diff > 0) {
+					return 1;
+				} else if (diff == 0) {
+					return 0;
+				} else {
+					return -1;
 				}
 			}
-			if (s.getTasted() && s.getCount() > 0) {
-				if (s.getValue() > mostFavorite.getValue()) {
-					mostFavorite = s;
-				}
-			}
-		}
-		
+		});
 		
 		int[] toOffer = new int[rainbow.length];
 		int[] toRecieve = new int[rainbow.length];
-		toOffer[leastFavorite.getColor()] = 1;
-		toRecieve[mostFavorite.getColor()] = 1;
 		
-		offTemp.setOffer(toOffer, toRecieve);
+		if (skittles.size() < 3) {
+			offTemp.setOffer(toOffer, toRecieve);
+			return;
+		}
+		
+		Skittle mostFavorite = skittles.size() > 2 ? skittles.get(0) : null;
+		Skittle leastFavorite = null;
+		double[] marketPrefs = kb.getMarketPreferences();
+		double currentMarketValue = Double.NEGATIVE_INFINITY;
+		for (int i = 2; i < skittles.size(); i++) {
+			double newMarketValue = marketPrefs[skittles.get(i).getIndex()];
+			if (newMarketValue > currentMarketValue) {
+				leastFavorite = skittles.get(i);
+				currentMarketValue = newMarketValue;
+			}
+		}
+
+		if (leastFavorite != null && mostFavorite != null) {
+			int count = (int) Math.min(Math.ceil(leastFavorite.getCount() / 5.0),
+							Math.ceil(mostFavorite.getCount() / 5.0));
+			toOffer[leastFavorite.getColor()] = count;
+			toRecieve[mostFavorite.getColor()] = count; 
+			offTemp.setOffer(toOffer, toRecieve);
+		}
 	}
 
 	@Override
 	public void happier(double dblHappinessUp) {
-		this.dblHappiness += dblHappinessUp;
 		if (myMouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
 			double utility = mySense.findHappinessForSkittle(dblHappinessUp, myMouth.howMany);
 			myMouth.skittleInMouth.setValue(utility);
@@ -129,21 +144,55 @@ public class Ebenezer extends Player {
 	}
 
 	@Override
-	public Offer pickOffer(Offer[] aoffCurrentOffers) {
-		// TODO Auto-generated method stub
+	public Offer pickOffer(Offer[] currentOffers) {
+		// We can't get the number of players another way...
+		if (kb == null) {
+			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex,
+					rainbow.length);
+		}
+		// Always pick the first live offer.
+		for (Offer o: currentOffers) {
+			if (o.getOfferLive() && canTake(o)) {
+				int[] desiredSkittles = o.getDesire();
+				int[] offeredSkittles = o.getOffer();
+				for (int i = 0; i < rainbow.length; i++) {
+					rainbow[i].incCount(offeredSkittles[i] - desiredSkittles[i]);
+				}
+				return o;
+			}
+		}
 		return null;
 	}
+	
+	private boolean canTake(Offer o) {
+		int[] desired = o.getDesire();
+		for (int i = 0; i < desired.length; i++) {
+			if (rainbow[i].getCount() < desired[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-	//Someone pick the offer
+	//Someone picked the offer we made
 	@Override
-	public void offerExecuted(Offer offPicked) {
-		// TODO Auto-generated method stub
+	public void offerExecuted(Offer picked) {
+		int[] desiredSkittles = picked.getDesire();
+		int[] offeredSkittles = picked.getOffer();
+		for (int i = 0; i < rainbow.length; i++) {
+			rainbow[i].incCount(desiredSkittles[i] - offeredSkittles[i]);
+		}
 	}
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
-		// TODO Auto-generated method stub
-
+		for (Offer o : aoffCurrentOffers) {
+			if (o.getPickedByIndex() > -1) {
+				kb.storeSelectedTrade(o);
+			} else {
+				kb.storeUnselectedTrade(o);
+			}
+		}
 	}
 
 	@Override
