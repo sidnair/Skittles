@@ -269,7 +269,7 @@ public class Game
 			}
 			else
 			{
-				System.out.println( "Player #" + intPlayerIndex + ": You cannot eat these. Take them out of your mouth!" );
+				System.out.println( "Player #" + intPlayerIndex + ": You cannot eat " + Game.arrayToString(aintTempEat) + " . Take them out of your mouth!" );
 			}
 			// process offer
 			aplyPlayers[ intPlayerIndex ].offer( offTemp );

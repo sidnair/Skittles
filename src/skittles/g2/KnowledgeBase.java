@@ -35,6 +35,8 @@ public class KnowledgeBase {
 	
 	
 	public KnowledgeBase(int playerCount, int selfIndex, int skittleCount) {
+		successfulOffers = new ArrayList<Offer>();
+		unsuccessfulOffers = new ArrayList<Offer>();
 		this.selfIndex = selfIndex;
 		playerHistories = new ArrayList<PreferenceHistory>();
 		for (int i = 0; i < playerCount; i++) {
@@ -43,7 +45,8 @@ public class KnowledgeBase {
 		marketHistory = new PreferenceHistory(skittleCount);
 	}
 	
-	public void storeUnselectedTrade(int proposer, Offer offer) {
+	public void storeUnselectedTrade(Offer offer) {
+		int proposer = offer.getOfferedByIndex();
 		playerHistories.get(proposer).addUnsuccessfulTrade(offer.getOffer(),
 				offer.getDesire());
 		if (proposer != selfIndex) {
@@ -53,7 +56,10 @@ public class KnowledgeBase {
 		unsuccessfulOffers.add(offer);
 	}
 	
-	public void storeSelectedTrade(int proposer, int selector, Offer offer) {
+	public void storeSelectedTrade(Offer offer) {
+		int proposer = offer.getOfferedByIndex();
+		int selector = offer.getPickedByIndex();
+		
 		playerHistories.get(proposer).addUnsuccessfulTrade(offer.getOffer(),
 				offer.getDesire());
 		playerHistories.get(selector).addUnsuccessfulTrade(offer.getDesire(),
