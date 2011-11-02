@@ -152,6 +152,7 @@ public class Ebenezer extends Player {
 			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
 		}
 		// Always pick the first live offer.
+		// TODO: choose the trade with the highest score
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
 				int[] desiredSkittles = o.getDesire();
@@ -163,6 +164,11 @@ public class Ebenezer extends Player {
 			}
 		}
 		return null;
+	}
+	
+	private double tradeUtility(Offer o) {
+		// TODO: compute the utility of a trade
+		return 0.0;
 	}
 
 	private boolean canTake(Offer o) {
