@@ -3,13 +3,13 @@ package skittles.g2;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class Rainbow {
+public class Inventory {
 	
 	private Skittle[] skittles;
 	private PriorityQueue<Skittle> skittlesToTry;
 	
 	
-	public Rainbow(int[] aintInHand) {
+	public Inventory(int[] aintInHand) {
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {
 			skittles[i] = new Skittle(aintInHand[i], i);
@@ -32,12 +32,12 @@ public class Rainbow {
 		return skittles[color];
 	}
 	
-	public Skittle[] getSkittles() {
-		return skittles;
-	}
-	
 	public Skittle getSkittle(int color) {
 		return skittles[color];
+	}
+	
+	public Skittle[] getSkittles() {
+		return skittles;
 	}
 	
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {

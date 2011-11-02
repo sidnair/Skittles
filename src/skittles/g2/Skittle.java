@@ -1,5 +1,8 @@
 package skittles.g2;
 
+/**
+ * A group of a single color of Skittles
+ */
 public class Skittle {
 
 	private boolean tasted;
@@ -7,22 +10,16 @@ public class Skittle {
 	private double value;
 	private int color;
 	public static final double UNDEFINED_VALUE = -2.0;
-	int index;
 		
 	public Skittle(int count, int color) {
 		this.count = count;
 		this.tasted = false;
 		this.color = color;
 		this.value = UNDEFINED_VALUE;
-		this.index = color;
 	}
-	
-	public int getIndex() {
-		return this.index;
-	}
-	
+
 	public int getColor() {
-		return color;
+		return this.color;
 	}
 	
 	public void setValue(double value) {
@@ -30,11 +27,11 @@ public class Skittle {
 	}
 	
 	public double getValue() {
-		return value;
+		return this.value;
 	}
 	
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 	
 	public void incCount(int incrementBy) {
@@ -46,14 +43,13 @@ public class Skittle {
 	}
 	
 	public boolean isTasted() {
-		return tasted;
+		return this.tasted;
 	}
 	
 	public void setTasted() {
 		this.tasted = true;
 	}
 		
-
 	public String toString() {
 		String ret = "[color: " + color + ", (count: " + count + "), ";
 		if (this.value != UNDEFINED_VALUE) {

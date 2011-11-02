@@ -20,14 +20,14 @@ public class Ebenezer extends Player {
 	private Mouth myMouth;
 	private Sense mySense;
 	private KnowledgeBase kb;
-	private Rainbow rainbow;
+	private Inventory rainbow;
 	
 	@Override
 	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
 		this.intPlayerNum = intPlayerNum;
-		rainbow = new Rainbow(aintInHand);
+		rainbow = new Inventory(aintInHand);
 		myMouth = new Mouth();
 		mySense = new Sense();
 		dblHappiness = 0;
@@ -52,20 +52,33 @@ public class Ebenezer extends Player {
 			myMouth.howMany = 1;
 		}
 	}
-
+	
+	/**
+	 * Bad name because of simulator API
+	 */
 	public void offer(Offer offTemp) {
+		makeOffer(offTemp);
+	}
+
+	/**
+	 * Given an 0-for-0 Offer object, mutate it to the offer we want to put on the table.
+	 * @param offTemp the offer reference from the simulator
+	 */
+	public void makeOffer(Offer offTemp) {
 		if (rainbow.tastedSkittlesByCount().isEmpty()) {
 			return;
 		}
 
-		ArrayList<Skittle> skittles = new ArrayList<Skittle>();
+		ArrayList<Skittle> tastedSkittles = new ArrayList<Skittle>();
 		for (Skittle s : rainbow.getSkittles()) {
 			if (s.isTasted()) {
-				skittles.add(s);
+				tastedSkittles.add(s);
 			}
 		}
 
-		Collections.sort(skittles, new Comparator<Skittle>() {
+		// sort skittles by how much we like their color
+		// TODO: why is this clobbering natural ordering within positive and negative-valued skittles?
+		Collections.sort(tastedSkittles, new Comparator<Skittle>() {
 			@Override
 			public int compare(Skittle first, Skittle second) {
 				double diff = first.getValue() - second.getValue();
@@ -79,31 +92,42 @@ public class Ebenezer extends Player {
 			}
 		});
 
+		// the two sides of our new offer
 		int[] toOffer = new int[rainbow.getSkittles().length];
-		int[] toRecieve = new int[rainbow.getSkittles().length];
+		int[] toReceive = new int[rainbow.getSkittles().length];
 
-		if (skittles.size() < 3) {
-			offTemp.setOffer(toOffer, toRecieve);
+		//if we haven't tasted more than 3 colors, make a null offer. (0-for-0)
+		if (tastedSkittles.size() < 3) {
+			offTemp.setOffer(toOffer, toReceive);
 			return;
 		}
 
-		Skittle mostFavorite = skittles.size() > 2 ? skittles.get(0) : null;
-		Skittle leastFavorite = null;
+		//if we've tasted more than two colors, get our favorite one
+		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
+		Skittle unwantedColor = null;
+		
 		double[] marketPrefs = kb.getMarketPreferences();
 		double currentMarketValue = Double.NEGATIVE_INFINITY;
-		for (int i = 2; i < skittles.size(); i++) {
-			double newMarketValue = marketPrefs[skittles.get(i).getIndex()];
+		
+		// starting with third-best color, find the color with the highest market value.
+		// set it as our unwanted color.
+		for (int i = 2; i < tastedSkittles.size(); i++) {
+			double newMarketValue = marketPrefs[tastedSkittles.get(i).getColor()];
 			if (newMarketValue > currentMarketValue) {
-				leastFavorite = skittles.get(i);
+				unwantedColor = tastedSkittles.get(i);
 				currentMarketValue = newMarketValue;
 			}
 		}
 
-		if (leastFavorite != null && mostFavorite != null) {
-			int count = (int) Math.min(Math.ceil(leastFavorite.getCount() / 5.0), Math.ceil(mostFavorite.getCount() / 5.0));
-			toOffer[leastFavorite.getColor()] = count;
-			toRecieve[mostFavorite.getColor()] = count;
-			offTemp.setOffer(toOffer, toRecieve);
+		// if we know what color we want AND what color we don't want,
+		// set the offer to SEND unwantedColor and RECEIVE wantedColor
+		if (unwantedColor != null && wantedColor != null) {
+			// TODO: why are we calculating count like this?
+			// TODO: make offers of mixed colors
+			int count = (int) Math.min(Math.ceil(unwantedColor.getCount() / 5.0), Math.ceil(wantedColor.getCount() / 5.0));
+			toOffer[unwantedColor.getColor()] = count;
+			toReceive[wantedColor.getColor()] = count;
+			offTemp.setOffer(toOffer, toReceive);
 		}
 	}
 
