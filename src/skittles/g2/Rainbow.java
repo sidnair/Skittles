@@ -8,6 +8,7 @@ public class Rainbow {
 	private Skittle[] skittles;
 	private PriorityQueue<Skittle> skittlesToTry;
 	
+	
 	public Rainbow(int[] aintInHand) {
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {
@@ -16,6 +17,10 @@ public class Rainbow {
 				skittlesToTry.add(skittles[i]);
 			}
 		}
+	}
+	
+	public int size() {
+		return skittles.length;
 	}
 	
 /*	public int[] eatSkittles() {
@@ -29,6 +34,10 @@ public class Rainbow {
 	
 	public Skittle[] getSkittles() {
 		return skittles;
+	}
+	
+	public Skittle getSkittle(int color) {
+		return skittles[color];
 	}
 	
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {
