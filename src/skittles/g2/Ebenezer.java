@@ -80,7 +80,6 @@ public class Ebenezer extends Player {
 		}
 
 		// sort skittles by how much we like their color
-		// TODO: why is this clobbering natural ordering within positive and negative-valued skittles?
 		Collections.sort(tastedSkittles, new Comparator<Skittle>() {
 			@Override
 			public int compare(Skittle first, Skittle second) {

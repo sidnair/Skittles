@@ -19,6 +19,9 @@ import skittles.manualplayer.ManualP;
 
 public class Game 
 {
+	// NOTE: this seed is constant for deterministic testing purposes!
+	// set it to (something non-constant) for actual simulation!
+	private static final int SEED = 1234567;
 	private Player[] aplyPlayers;
 	private PlayerStatus[] aplsPlayerStatus;
 	private int intPlayerNum;
@@ -329,7 +332,7 @@ public class Game
 	private double[] randomTastes(double dblMean) 
 	{
 		double[] adblRandomTastes = new double[ intColorNum ];
-		Random rdmTemp = new Random();
+		Random rdmTemp = new Random(SEED);
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
 			double dblTemp = -5;		// out of range [ -1, 1 ]
@@ -360,7 +363,7 @@ public class Game
 ////			System.out.print( aintRandomInHand[ intColorIndex ] + " " );
 //		}
 //		System.out.println();
-		Random rdmTemp = new Random();
+		Random rdmTemp = new Random(SEED);
 		for ( int intSkittleIndex = 0; intSkittleIndex < intTotalNum; intSkittleIndex ++ )
 		{
 			int intTemp = rdmTemp.nextInt( intColorNum );
@@ -486,7 +489,7 @@ public class Game
 			alPlayerIndices.add( intPlayerIndex );
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
-		Random rdmGenerator = new Random();
+		Random rdmGenerator = new Random(SEED);
 		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
