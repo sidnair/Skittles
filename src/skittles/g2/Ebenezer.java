@@ -21,6 +21,7 @@ public class Ebenezer extends Player {
 	private Sense mySense;
 	private KnowledgeBase kb;
 	private Inventory inventory;
+	private Offer ourOffer;
 	
 	@Override
 	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
@@ -134,6 +135,9 @@ public class Ebenezer extends Player {
 			toReceive[wantedColor.getColor()] = count;
 			offTemp.setOffer(toOffer, toReceive);
 		}
+		
+		//This is a hack for the meantime because we cannot update if we pick our own offer
+		ourOffer = offTemp;
 	}
 
 	@Override
@@ -155,10 +159,15 @@ public class Ebenezer extends Player {
 			if (o.getOfferLive() && canTake(o)) {
 				int[] desiredSkittles = o.getDesire();
 				int[] offeredSkittles = o.getOffer();
+				
+				//This is a hack for the meantime because we cannot update if we pick our own offer
 				for (int i = 0; i < inventory.size(); i++) {
-					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+					if (ourOffer != null && !ourOffer.equals(o)){
+						inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+					}
 				}
 				return o;
+				
 			}
 		}
 		return null;
@@ -213,7 +222,6 @@ public class Ebenezer extends Player {
 
 	public class Mouth {
 		public void put(Skittle s, int h) {
-			System.out.println(intPlayerIndex + " trying to eat " + h + " of " + s);
 			this.skittleInMouth = s;
 			this.howMany = h;
 			s.updateCount(-h);
