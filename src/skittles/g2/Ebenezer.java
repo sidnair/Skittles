@@ -177,7 +177,21 @@ public class Ebenezer extends Player {
 	
 	private double tradeUtility(Offer o) {
 		// TODO: compute the utility of a trade
-		return 0.0;
+		double deltaIn = 0.0;
+		double deltaOut = 0.0;
+		
+		int[] in = o.getDesire();
+		int[] out = o.getOffer();
+		
+		for(int i = 0; i < in.length; i++) {
+			deltaIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
+		}
+		
+		for(int i = 0; i < in.length; i++) {
+			deltaOut += inventory.getSkittle(i).getValue() * Math.pow(out[i], 2);
+		}
+		
+		return deltaIn - deltaOut;
 	}
 
 	private boolean canTake(Offer o) {
