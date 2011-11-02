@@ -2,22 +2,22 @@
 <GameConfig>
 	<Game>
 		<ColorNum>5</ColorNum>
-		<SkittleNum>10</SkittleNum>
+		<SkittleNum>30</SkittleNum>
 	</Game>
 
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
 		<Happiness>-0.5, -0.2, 0.1, 0.4, 0.8</Happiness>
-		<InHand>6,6,7,7,7</InHand>
+		<InHand>6,6,6,6,6</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
 		<Happiness>-0.5, -0.2, 0.1, 0.4, 0.8</Happiness>
-		<InHand>6,6,8,7,7</InHand>
+		<InHand>6,6,6,6,6</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
 		<Happiness>-0.5, -0.2, 0.1, 0.4, 0.8</Happiness>
-		<InHand>6,6,7,7,7</InHand>
+		<InHand>6,6,6,6,6</InHand>
 	</Player>
 </GameConfig>

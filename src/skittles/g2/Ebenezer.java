@@ -1,6 +1,7 @@
 
 package skittles.g2;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -165,7 +166,13 @@ public class Ebenezer extends Player {
 	}
 
 	private boolean canTake(Offer o) {
+		int[] offered = o.getOffer();
 		int[] desired = o.getDesire();
+		
+		if(Arrays.equals(offered, desired)) {
+			return false;
+		}
+		
 		for (int i = 0; i < desired.length; i++) {
 			if (inventory.getSkittle(i).getCount() < desired[i]) {
 				return false;
