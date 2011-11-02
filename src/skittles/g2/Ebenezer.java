@@ -38,21 +38,7 @@ public class Ebenezer extends Player {
 	public void eat(int[] aintTempEat) {
 		//Do Something
 	}
-
-	private void rationOrPigOut(int[] aintTempEat, Skittle toEat) {
-		if (toEat.getValue() > 0) {
-			aintTempEat[toEat.getColor()] = toEat.getCount();
-			toEat.decCount(toEat.getCount());
-			myMouth.skittleInMouth = toEat;
-			myMouth.howMany = toEat.getCount();
-		} else {
-			aintTempEat[toEat.getColor()] = 1;
-			toEat.decCount(1);
-			myMouth.skittleInMouth = toEat;
-			myMouth.howMany = 1;
-		}
-	}
-
+	
 	public void offer(Offer offTemp) {
 		if (rainbow.tastedSkittlesByCount().isEmpty()) {
 			return;
