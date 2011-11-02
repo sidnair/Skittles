@@ -84,8 +84,6 @@ public class Ebenezer extends Player {
 			return;
 		}
 		
-		//if you make a trade for a color that is worth hoarding
-
 		//if we've tasted more than two colors, get our favorite one
 		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
 		Skittle unwantedColor = null;
@@ -105,7 +103,10 @@ public class Ebenezer extends Player {
 		}
 
 		// if we know what color we want AND what color we don't want,
-		// set the offer to SEND unwantedColor and RECEIVE wantedColor
+		// set the offer to SEND unwantedColor and RECEIVE wantedColor		
+		// at this point:
+		// unwantedColor is the highest-market-value color that is not one of our top two
+		// wantedColor is the color with the highest value
 		if (unwantedColor != null && wantedColor != null) {
 			// TODO: why are we calculating count like this?
 			// TODO: make offers of mixed colors
