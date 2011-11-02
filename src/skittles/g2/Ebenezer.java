@@ -104,6 +104,8 @@ public class Ebenezer extends Player {
 			offTemp.setOffer(toOffer, toReceive);
 			return;
 		}
+		
+		//if you make a trade for a color that is worth hoarding
 
 		//if we've tasted more than two colors, get our favorite one
 		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
@@ -112,6 +114,7 @@ public class Ebenezer extends Player {
 		double[] marketPrefs = kb.getMarketPreferences();
 		double currentMarketValue = Double.NEGATIVE_INFINITY;
 		
+		// TODO: move to KnowledgeBase
 		// starting with third-best color, find the color with the highest market value.
 		// set it as our unwanted color.
 		for (int i = 2; i < tastedSkittles.size(); i++) {
