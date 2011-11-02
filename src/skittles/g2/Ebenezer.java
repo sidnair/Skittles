@@ -86,14 +86,18 @@ public class Ebenezer extends Player {
 			public int compare(Skittle first, Skittle second) {
 				double diff = first.getValue() - second.getValue();
 				if (diff > 0) {
-					return 1;
+					return -1;
 				} else if (diff == 0) {
 					return 0;
 				} else {
-					return -1;
+					return 1;
 				}
 			}
 		});
+		if(DEBUG) {
+			System.out.println("\ntasted:");
+			for(Skittle s: tastedSkittles) System.out.println(s.toString());
+		}
 
 		// the two sides of our new offer
 		int[] toOffer = new int[inventory.getSkittles().length];
@@ -173,18 +177,21 @@ public class Ebenezer extends Player {
 			public int compare(Offer first, Offer second) {
 				double diff = tradeUtility(first) - tradeUtility(second);
 				if (diff > 0) {
-					return 1;
+					return -1;
 				} else if (diff == 0) {
 					return 0;
 				} else {
-					return -1;
+					return 1;
 				}
 			}
 		});
 		
 		Offer bestTrade = trades.get(0);
 		double bestTradeUtility = tradeUtility(bestTrade);
-		if(DEBUG) System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+		if(DEBUG) {
+			for(Offer t: trades) System.out.println(t.toString()+" = "+tradeUtility(t));
+			System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+		}
 		if(bestTrade != null && bestTradeUtility > 0) {
 			int[] desiredSkittles = bestTrade.getDesire();
 			int[] offeredSkittles = bestTrade.getOffer();
@@ -220,7 +227,7 @@ public class Ebenezer extends Player {
 			valueOut += inventory.getSkittle(j).getValue() * Math.pow(out[j], 2);
 		}
 		
-		return valueOut - valueIn;
+		return valueIn - valueOut;
 	}
 
 	private boolean canTake(Offer o) {
