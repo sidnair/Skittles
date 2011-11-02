@@ -31,7 +31,6 @@ public class Ebenezer extends Player {
 		myMouth = new Mouth();
 		mySense = new Sense();
 		dblHappiness = 0;
-		
 	}
 
 	@Override

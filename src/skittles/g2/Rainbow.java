@@ -6,27 +6,35 @@ import java.util.PriorityQueue;
 public class Rainbow {
 	
 	private Skittle[] skittles;
-	private PriorityQueue<Skittle> skittlesToTry;
 	
 	
 	public Rainbow(int[] aintInHand) {
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {
 			skittles[i] = new Skittle(aintInHand[i], i);
-			if (aintInHand[i] > 0) {
-				skittlesToTry.add(skittles[i]);
+		}
+	}
+	
+	public boolean isWorthHoarding(int color) {
+		for (int i = 0; i < skittles.length; i++) {
+			if (i == color) {
+				continue;
+			}
+			double count2ndSktl = skittles[i].getCount();
+			double value = 1;
+			if (skittles[i].getValue() != Skittle.UNDEFINED_VALUE) {
+				value = skittles[i].getValue();
+			}
+			if (skittles[color].getCurrentWorth() < value*count2ndSktl*count2ndSktl) {
+				return false;
 			}
 		}
+		return true;
 	}
 	
 	public int size() {
 		return skittles.length;
 	}
-	
-/*	public int[] eatSkittles() {
-		PriorityQueue<Skittle> untasted = untastedSkittlesByCount();
-		
-	}*/
 		
 	public Skittle getSkittleByColor(int color) {
 		return skittles[color];
