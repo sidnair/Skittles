@@ -4,10 +4,10 @@ package skittles.g2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import skittles.sim.Offer;
 import skittles.sim.Player;
-import skittles.sim.Skittles;
 
 public class Ebenezer extends Player {
 
@@ -20,14 +20,14 @@ public class Ebenezer extends Player {
 	private Mouth myMouth;
 	private Sense mySense;
 	private KnowledgeBase kb;
-	private Inventory rainbow;
+	private Inventory inventory;
 	
 	@Override
 	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
 		this.intPlayerIndex = intPlayerIndex;
 		this.strClassName = strClassName;
 		this.intPlayerNum = intPlayerNum;
-		rainbow = new Inventory(aintInHand);
+		inventory = new Inventory(aintInHand);
 		myMouth = new Mouth();
 		mySense = new Sense();
 		dblHappiness = 0;
@@ -35,7 +35,28 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void eat(int[] aintTempEat) {
-		//Do Something
+		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();
+		if (!untasted.isEmpty()) {
+			Skittle next = untasted.remove();
+			next.setTasted();
+			aintTempEat[next.getColor()] = 1;
+			myMouth.put(next, 1);
+			return;
+		}
+		PriorityQueue<Skittle> highestNegative = inventory.leastNegativeSkittles();
+		if (!highestNegative.isEmpty()) {
+			Skittle next = highestNegative.remove();
+			next.setTasted();
+			aintTempEat[next.getColor()] = 1;
+			myMouth.put(next, 1);
+			return;
+		}
+		PriorityQueue<Skittle> skittlesByValuesLowest = inventory.skittlesByValuesLowest();
+		Skittle next = skittlesByValuesLowest.remove();
+		next.setTasted();
+		aintTempEat[next.getColor()] = next.getCount();
+		System.out.println("Positive Values");
+		myMouth.put(next, next.getCount());
 	}
 	
 	public void offer(Offer offTemp) {
@@ -47,12 +68,12 @@ public class Ebenezer extends Player {
 	 * @param offTemp the offer reference from the simulator
 	 */
 	public void makeOffer(Offer offTemp) {
-		if (rainbow.tastedSkittlesByCount().isEmpty()) {
+		if (inventory.tastedSkittlesByCount().isEmpty()) {
 			return;
 		}
 
 		ArrayList<Skittle> tastedSkittles = new ArrayList<Skittle>();
-		for (Skittle s : rainbow.getSkittles()) {
+		for (Skittle s : inventory.getSkittles()) {
 			if (s.isTasted()) {
 				tastedSkittles.add(s);
 			}
@@ -75,8 +96,8 @@ public class Ebenezer extends Player {
 		});
 
 		// the two sides of our new offer
-		int[] toOffer = new int[rainbow.getSkittles().length];
-		int[] toReceive = new int[rainbow.getSkittles().length];
+		int[] toOffer = new int[inventory.getSkittles().length];
+		int[] toReceive = new int[inventory.getSkittles().length];
 
 		//if we haven't tasted more than 3 colors, make a null offer. (0-for-0)
 		if (tastedSkittles.size() < 3) {
@@ -125,15 +146,15 @@ public class Ebenezer extends Player {
 	public Offer pickOffer(Offer[] currentOffers) {
 		// We can't get the number of players another way...
 		if (kb == null) {
-			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, rainbow.getSkittles().length);
+			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
 		}
 		// Always pick the first live offer.
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
 				int[] desiredSkittles = o.getDesire();
 				int[] offeredSkittles = o.getOffer();
-				for (int i = 0; i < rainbow.size(); i++) {
-					rainbow.getSkittle(i).incCount(offeredSkittles[i] - desiredSkittles[i]);
+				for (int i = 0; i < inventory.size(); i++) {
+					inventory.getSkittle(i).incCount(offeredSkittles[i] - desiredSkittles[i]);
 				}
 				return o;
 			}
@@ -144,7 +165,7 @@ public class Ebenezer extends Player {
 	private boolean canTake(Offer o) {
 		int[] desired = o.getDesire();
 		for (int i = 0; i < desired.length; i++) {
-			if (rainbow.getSkittle(i).getCount() < desired[i]) {
+			if (inventory.getSkittle(i).getCount() < desired[i]) {
 				return false;
 			}
 		}
@@ -156,9 +177,9 @@ public class Ebenezer extends Player {
 	public void offerExecuted(Offer offPicked) {
 		int[] aintOffer = offPicked.getOffer();
 		int[] aintDesire = offPicked.getDesire();
-		for (int i = 0; i < rainbow.size(); i++) {
-			rainbow.getSkittle(i).incCount(aintDesire[i]);
-			rainbow.getSkittle(i).decCount(aintOffer[i]);
+		for (int i = 0; i < inventory.size(); i++) {
+			inventory.getSkittle(i).incCount(aintDesire[i]);
+			inventory.getSkittle(i).decCount(aintOffer[i]);
 		}
 	}
 
@@ -190,6 +211,12 @@ public class Ebenezer extends Player {
 	}
 
 	public class Mouth {
+		public void put(Skittle s, int h) {
+			System.out.println(intPlayerIndex + " trying to eat " + h + " of " + s);
+			this.skittleInMouth = s;
+			this.howMany = h;
+			s.decCount(h);
+		}
 		public Skittle skittleInMouth;
 		public int howMany;
 	}

@@ -52,7 +52,7 @@ public class Inventory {
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {
 		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
 		for (Skittle s: skittles) {
-			if (!s.isTasted()) {
+			if (!s.isTasted() && s.getCount() > 0) {
 				ret.add(s);
 			}
 		}
@@ -62,25 +62,29 @@ public class Inventory {
 	public PriorityQueue<Skittle> tastedSkittlesByCount() {
 		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
 		for (Skittle s: skittles) {
-			if (s.isTasted()) {
+			if (s.isTasted() && s.getCount() > 0) {
+				ret.add(s);
+			}
+		}
+		return ret;
+	}
+		
+	public PriorityQueue<Skittle> leastNegativeSkittles() {
+		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValueHigh());
+		for (Skittle s: skittles) {
+			if (s.getValue() <= 0 && s.getValue() != Skittle.UNDEFINED_VALUE && s.getCount() > 0) {
 				ret.add(s);
 			}
 		}
 		return ret;
 	}
 	
-	public PriorityQueue<Skittle> skittlesByCount() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
+	public PriorityQueue<Skittle> skittlesByValuesLowest() {
+		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValueLow());
 		for (Skittle s: skittles) {
-			ret.add(s);
-		}
-		return ret;
-	}
-	
-	public PriorityQueue<Skittle> skittlesByValue() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValue());
-		for (Skittle s: skittles) {
-			ret.add(s);
+			if (s.getCount() > 0) {
+				ret.add(s);
+			}
 		}
 		return ret;
 	}
@@ -100,7 +104,7 @@ public class Inventory {
 	}
 
 	/* Comparator for Skittles PriQueue By Value */
-	private class SkittleComparatorByValue implements Comparator<Skittle> {
+	private class SkittleComparatorByValueLow implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
 			if (x.getValue() < y.getValue()) {
@@ -111,5 +115,19 @@ public class Inventory {
 			}
 			return 0;
 		}
-	}	
+	}
+	
+	/* Comparator for Skittles PriQueue By Value */
+	private class SkittleComparatorByValueHigh implements Comparator<Skittle> {
+		@Override
+		public int compare(Skittle x, Skittle y) {
+			if (x.getValue() > y.getValue()) {
+				return -1;
+			}
+			if (x.getValue() < y.getValue()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
 }
