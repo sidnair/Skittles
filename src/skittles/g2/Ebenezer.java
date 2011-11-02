@@ -111,7 +111,7 @@ public class Ebenezer extends Player {
 	@Override
 	public void happier(double dblHappinessUp) {
 		if (myMouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
-			double utility = mySense.findHappinessForSkittle(dblHappinessUp, myMouth.howMany);
+			double utility = mySense.getIndividualHappiness(dblHappinessUp, myMouth.howMany);
 			myMouth.skittleInMouth.setValue(utility);
 		}
 	}
