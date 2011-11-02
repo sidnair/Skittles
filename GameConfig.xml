@@ -12,12 +12,12 @@
 	</Player>
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
-		<Happiness>-0.5, -0.2, 0.1, 0.4, 0.8</Happiness>
+		<Happiness>-0.5, -0.2, 0.1, 0.8, 0.4</Happiness>
 		<InHand>6,6,6,6,6</InHand>
 	</Player>
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
-		<Happiness>-0.5, -0.2, 0.1, 0.4, 0.8</Happiness>
+		<Happiness>-0.5, -0.2, 0.8, 0.4, 0.1</Happiness>
 		<InHand>6,6,6,6,6</InHand>
 	</Player>
 </GameConfig>

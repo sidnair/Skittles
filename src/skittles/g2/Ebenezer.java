@@ -183,8 +183,9 @@ public class Ebenezer extends Player {
 		});
 		
 		Offer bestTrade = trades.get(0);
-		
-		if(bestTrade != null) {
+		double bestTradeUtility = tradeUtility(bestTrade);
+		if(DEBUG) System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+		if(bestTrade != null && bestTradeUtility > 0) {
 			int[] desiredSkittles = bestTrade.getDesire();
 			int[] offeredSkittles = bestTrade.getOffer();
 			
@@ -203,21 +204,23 @@ public class Ebenezer extends Player {
 	
 	private double tradeUtility(Offer o) {
 		// TODO: compute the utility of a trade
-		double deltaIn = 0.0;
-		double deltaOut = 0.0;
+		double valueIn = 0.0;
+		double valueOut = 0.0;
 		
-		int[] in = o.getDesire();
-		int[] out = o.getOffer();
-		
-		for(int i = 0; i < in.length; i++) {
-			deltaIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
-		}
+		// what we receive is what they are offering
+		int[] in = o.getOffer();
+		// what we send is what they want
+		int[] out = o.getDesire();
 		
 		for(int i = 0; i < in.length; i++) {
-			deltaOut += inventory.getSkittle(i).getValue() * Math.pow(out[i], 2);
+			valueIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
 		}
 		
-		return deltaIn - deltaOut;
+		for(int j = 0; j < in.length; j++) {
+			valueOut += inventory.getSkittle(j).getValue() * Math.pow(out[j], 2);
+		}
+		
+		return valueOut - valueIn;
 	}
 
 	private boolean canTake(Offer o) {
