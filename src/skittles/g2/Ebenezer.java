@@ -155,23 +155,49 @@ public class Ebenezer extends Player {
 		if (kb == null) {
 			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
 		}
-		// Always pick the first live offer.
-		// TODO: choose the trade with the highest score
+		
+		ArrayList<Offer> trades = new ArrayList<Offer>();
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
-				int[] desiredSkittles = o.getDesire();
-				int[] offeredSkittles = o.getOffer();
-				
-				//This is a hack for the meantime because we cannot update if we pick our own offer
-				for (int i = 0; i < inventory.size(); i++) {
-					if (ourOffer != null && !ourOffer.equals(o)){
-						inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
-					}
-				}
-				return o;
-				
+				trades.add(o);
 			}
 		}
+		
+		if(trades.size() == 0) {
+			return null;
+		}
+		
+		//sort trades by their utility (computed by tradeUtility())
+		Collections.sort(trades, new Comparator<Offer>() {
+			@Override
+			public int compare(Offer first, Offer second) {
+				double diff = tradeUtility(first) - tradeUtility(second);
+				if (diff > 0) {
+					return 1;
+				} else if (diff == 0) {
+					return 0;
+				} else {
+					return -1;
+				}
+			}
+		});
+		
+		Offer bestTrade = trades.get(0);
+		
+		if(bestTrade != null) {
+			int[] desiredSkittles = bestTrade.getDesire();
+			int[] offeredSkittles = bestTrade.getOffer();
+			
+			//This is a hack for the meantime because we cannot update if we pick our own offer
+			for (int i = 0; i < inventory.size(); i++) {
+				if (ourOffer != null && !ourOffer.equals(bestTrade)){
+					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+				}
+			}
+			
+			return bestTrade;
+		}
+		
 		return null;
 	}
 	
