@@ -55,7 +55,6 @@ public class Ebenezer extends Player {
 		Skittle next = skittlesByValuesLowest.remove();
 		next.setTasted();
 		aintTempEat[next.getColor()] = next.getCount();
-		System.out.println("Positive Values");
 		myMouth.put(next, next.getCount());
 	}
 	
@@ -157,7 +156,7 @@ public class Ebenezer extends Player {
 				int[] desiredSkittles = o.getDesire();
 				int[] offeredSkittles = o.getOffer();
 				for (int i = 0; i < inventory.size(); i++) {
-					inventory.getSkittle(i).incCount(offeredSkittles[i] - desiredSkittles[i]);
+					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
 				}
 				return o;
 			}
@@ -181,8 +180,7 @@ public class Ebenezer extends Player {
 		int[] aintOffer = offPicked.getOffer();
 		int[] aintDesire = offPicked.getDesire();
 		for (int i = 0; i < inventory.size(); i++) {
-			inventory.getSkittle(i).incCount(aintDesire[i]);
-			inventory.getSkittle(i).decCount(aintOffer[i]);
+			inventory.getSkittle(i).updateCount(aintDesire[i] - aintOffer[i]);
 		}
 	}
 
@@ -218,7 +216,7 @@ public class Ebenezer extends Player {
 			System.out.println(intPlayerIndex + " trying to eat " + h + " of " + s);
 			this.skittleInMouth = s;
 			this.howMany = h;
-			s.decCount(h);
+			s.updateCount(-h);
 		}
 		public Skittle skittleInMouth;
 		public int howMany;

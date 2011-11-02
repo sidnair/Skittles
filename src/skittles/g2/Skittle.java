@@ -34,14 +34,10 @@ public class Skittle {
 		return this.count;
 	}
 	
-	public void incCount(int incrementBy) {
-		this.count += incrementBy;
+	public void updateCount(int count) {
+		this.count += count;
 	}
-	
-	public void decCount(int decrementBy) {
-		this.count -= decrementBy;
-	}
-	
+		
 	public boolean isTasted() {
 		return this.tasted;
 	}
