@@ -54,13 +54,12 @@ public class Ebenezer extends Player {
 	}
 
 	public void offer(Offer offTemp) {
-		Skittle[] mySkittles = rainbow.getSkittles();
 		if (rainbow.tastedSkittlesByCount().isEmpty()) {
 			return;
 		}
 
 		ArrayList<Skittle> skittles = new ArrayList<Skittle>();
-		for (Skittle s : mySkittles) {
+		for (Skittle s : rainbow.getSkittles()) {
 			if (s.isTasted()) {
 				skittles.add(s);
 			}
@@ -127,8 +126,8 @@ public class Ebenezer extends Player {
 			if (o.getOfferLive() && canTake(o)) {
 				int[] desiredSkittles = o.getDesire();
 				int[] offeredSkittles = o.getOffer();
-				for (int i = 0; i < rainbow.getSkittles().length; i++) {
-					rainbow.getSkittles()[i].incCount(offeredSkittles[i] - desiredSkittles[i]);
+				for (int i = 0; i < rainbow.size(); i++) {
+					rainbow.getSkittle(i).incCount(offeredSkittles[i] - desiredSkittles[i]);
 				}
 				return o;
 			}
@@ -139,7 +138,7 @@ public class Ebenezer extends Player {
 	private boolean canTake(Offer o) {
 		int[] desired = o.getDesire();
 		for (int i = 0; i < desired.length; i++) {
-			if (rainbow.getSkittles()[i].getCount() < desired[i]) {
+			if (rainbow.getSkittle(i).getCount() < desired[i]) {
 				return false;
 			}
 		}
@@ -151,9 +150,9 @@ public class Ebenezer extends Player {
 	public void offerExecuted(Offer offPicked) {
 		int[] aintOffer = offPicked.getOffer();
 		int[] aintDesire = offPicked.getDesire();
-		for (int i = 0; i < rainbow.getSkittles().length; i++) {
-			rainbow.getSkittles()[i].incCount(aintDesire[i]);
-			rainbow.getSkittles()[i].decCount(aintOffer[i]);
+		for (int i = 0; i < rainbow.size(); i++) {
+			rainbow.getSkittle(i).incCount(aintDesire[i]);
+			rainbow.getSkittle(i).decCount(aintOffer[i]);
 		}
 	}
 
