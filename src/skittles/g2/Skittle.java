@@ -49,6 +49,15 @@ public class Skittle {
 	public void setTasted() {
 		this.tasted = true;
 	}
+	
+	/* If positive, we eat all at once otherwise one by one */
+	public double getCurrentWorth() {
+		if (this.value > 0) {
+			return this.count*this.count*this.value;
+		} else {
+			return this.value * this.count;
+		}
+	}
 		
 	public String toString() {
 		String ret = "[color: " + color + ", (count: " + count + "), ";

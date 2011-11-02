@@ -31,31 +31,13 @@ public class Ebenezer extends Player {
 		myMouth = new Mouth();
 		mySense = new Sense();
 		dblHappiness = 0;
-		
 	}
 
 	@Override
 	public void eat(int[] aintTempEat) {
 		//Do Something
 	}
-
-	private void rationOrPigOut(int[] aintTempEat, Skittle toEat) {
-		if (toEat.getValue() > 0) {
-			aintTempEat[toEat.getColor()] = toEat.getCount();
-			toEat.decCount(toEat.getCount());
-			myMouth.skittleInMouth = toEat;
-			myMouth.howMany = toEat.getCount();
-		} else {
-			aintTempEat[toEat.getColor()] = 1;
-			toEat.decCount(1);
-			myMouth.skittleInMouth = toEat;
-			myMouth.howMany = 1;
-		}
-	}
 	
-	/**
-	 * Bad name because of simulator API
-	 */
 	public void offer(Offer offTemp) {
 		makeOffer(offTemp);
 	}
