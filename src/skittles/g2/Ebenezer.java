@@ -1,6 +1,7 @@
 
 package skittles.g2;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -155,6 +156,7 @@ public class Ebenezer extends Player {
 			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
 		}
 		// Always pick the first live offer.
+		// TODO: choose the trade with the highest score
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
 				int[] desiredSkittles = o.getDesire();
@@ -172,9 +174,20 @@ public class Ebenezer extends Player {
 		}
 		return null;
 	}
+	
+	private double tradeUtility(Offer o) {
+		// TODO: compute the utility of a trade
+		return 0.0;
+	}
 
 	private boolean canTake(Offer o) {
+		int[] offered = o.getOffer();
 		int[] desired = o.getDesire();
+		
+		if(Arrays.equals(offered, desired)) {
+			return false;
+		}
+		
 		for (int i = 0; i < desired.length; i++) {
 			if (inventory.getSkittle(i).getCount() < desired[i]) {
 				return false;
