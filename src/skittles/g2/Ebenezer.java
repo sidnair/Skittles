@@ -37,6 +37,7 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void eat(int[] aintTempEat) {
+		//First try tasting what you dont know
 		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();
 		if (!untasted.isEmpty()) {
 			Skittle next = untasted.remove();
@@ -45,6 +46,9 @@ public class Ebenezer extends Player {
 			myMouth.put(next, 1);
 			return;
 		}
+		/*Then eat one by one the negative values from the highest possible (hopefully
+		 * getting rid of enough negatives - The argument being that eating multiple low positives
+		 * offsets the negatives  */
 		PriorityQueue<Skittle> highestNegative = inventory.leastNegativeSkittles();
 		if (!highestNegative.isEmpty()) {
 			Skittle next = highestNegative.remove();
@@ -53,6 +57,8 @@ public class Ebenezer extends Player {
 			myMouth.put(next, 1);
 			return;
 		}
+		//Then eat the positives by value in groups
+		//This should be changed to value by consuption, not absolute
 		PriorityQueue<Skittle> skittlesByValuesLowest = inventory.skittlesByValuesLowest();
 		Skittle next = skittlesByValuesLowest.remove();
 		next.setTasted();
