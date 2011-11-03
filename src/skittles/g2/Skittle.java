@@ -1,30 +1,25 @@
 package skittles.g2;
 
+/**
+ * A group of a single color of Skittles
+ */
 public class Skittle {
 
 	private boolean tasted;
 	private int count;
 	private double value;
-	private static int skittlesLeft = 0;
 	private int color;
 	public static final double UNDEFINED_VALUE = -2.0;
-	int index;
 		
 	public Skittle(int count, int color) {
 		this.count = count;
-		Skittle.skittlesLeft += count;
 		this.tasted = false;
 		this.color = color;
 		this.value = UNDEFINED_VALUE;
-		this.index = color;
 	}
-	
-	public int getIndex() {
-		return this.index;
-	}
-	
+
 	public int getColor() {
-		return color;
+		return this.color;
 	}
 	
 	public void setValue(double value) {
@@ -32,35 +27,34 @@ public class Skittle {
 	}
 	
 	public double getValue() {
-		return value;
+		return this.value;
 	}
 	
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 	
-	public void incCount(int incrementBy) {
-		this.count += incrementBy;
-		Skittle.skittlesLeft += incrementBy;
+	public void updateCount(int count) {
+		this.count += count;
 	}
-	
-	public void decCount(int decrementBy) {
-		this.count -= decrementBy;
-		Skittle.skittlesLeft -= decrementBy;
-	}
-	
+		
 	public boolean isTasted() {
-		return tasted;
+		return this.tasted;
 	}
 	
 	public void setTasted() {
 		this.tasted = true;
 	}
-		
-	public static int getSkittlesLeft() {
-		return skittlesLeft;
-	}
 	
+	/* If positive, we eat all at once otherwise one by one */
+	public double getCurrentWorth() {
+		if (this.value > 0) {
+			return this.count*this.count*this.value;
+		} else {
+			return this.value * this.count;
+		}
+	}
+		
 	public String toString() {
 		String ret = "[color: " + color + ", (count: " + count + "), ";
 		if (this.value != UNDEFINED_VALUE) {
