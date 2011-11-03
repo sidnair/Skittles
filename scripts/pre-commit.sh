@@ -1,5 +1,6 @@
 results_path="scripts/output/"
 
+
 java -classpath bin/:scripts/ skittles.sim.BatchSkittles > ${results_path}results.txt
 [ $? -eq 1 ] && echo "Sim crashed!" && exit 1
 ruby scripts/results_analyzer.rb
