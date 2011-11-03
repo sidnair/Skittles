@@ -1,2 +1,2 @@
-mv scripts/pre-commit.sh .git/hooks/
+cp scripts/pre-commit.sh .git/hooks/
 chmod 700 .git/hooks/pre-commit.sh
