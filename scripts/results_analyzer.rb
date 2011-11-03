@@ -35,7 +35,8 @@ Dir.foreach(root_path) do |path|
     old_score = old_scores[i]
     new_score = new_scores[i]
     # Want scores to increase. Check for regression
-    if new_score * 1.0 / old_score < threshold
+    if (new_score * 1.0 / old_score < threshold && old_score > new_score) ||
+        new_score < 0
       puts "Possible regression detected for case #{i}!"
       puts "Old data: #{old_score}"
       puts "New data: #{new_score}"

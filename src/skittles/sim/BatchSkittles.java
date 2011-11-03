@@ -11,7 +11,7 @@ public class BatchSkittles
 	{	
 		File dir = new File("configs/");
 		for (String s: dir.list()) {
-			new Game(s).runGame();
+			new Game("configs/" + s).runGame();
 		}
 	}
 }
