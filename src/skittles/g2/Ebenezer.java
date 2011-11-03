@@ -92,14 +92,18 @@ public class Ebenezer extends Player {
 			public int compare(Skittle first, Skittle second) {
 				double diff = first.getValue() - second.getValue();
 				if (diff > 0) {
-					return 1;
+					return -1;
 				} else if (diff == 0) {
 					return 0;
 				} else {
-					return -1;
+					return 1;
 				}
 			}
 		});
+		if(DEBUG) {
+			System.out.println("\ntasted:");
+			for(Skittle s: tastedSkittles) System.out.println(s.toString());
+		}
 
 		// the two sides of our new offer
 		int[] toOffer = new int[inventory.getSkittles().length];
@@ -161,29 +165,75 @@ public class Ebenezer extends Player {
 		if (kb == null) {
 			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
 		}
-		// Always pick the first live offer.
-		// TODO: choose the trade with the highest score
+		
+		ArrayList<Offer> trades = new ArrayList<Offer>();
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
-				int[] desiredSkittles = o.getDesire();
-				int[] offeredSkittles = o.getOffer();
-				
-				//This is a hack for the meantime because we cannot update if we pick our own offer
-				for (int i = 0; i < inventory.size(); i++) {
-					if (ourOffer != null && !ourOffer.equals(o)){
-						inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
-					}
-				}
-				return o;
-				
+				trades.add(o);
 			}
 		}
+		
+		if(trades.size() == 0) {
+			return null;
+		}
+		
+		//sort trades by their utility (computed by tradeUtility())
+		Collections.sort(trades, new Comparator<Offer>() {
+			@Override
+			public int compare(Offer first, Offer second) {
+				double diff = tradeUtility(first) - tradeUtility(second);
+				if (diff > 0) {
+					return -1;
+				} else if (diff == 0) {
+					return 0;
+				} else {
+					return 1;
+				}
+			}
+		});
+		
+		Offer bestTrade = trades.get(0);
+		double bestTradeUtility = tradeUtility(bestTrade);
+		if(DEBUG) {
+			for(Offer t: trades) System.out.println(t.toString()+" = "+tradeUtility(t));
+			System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+		}
+		if(bestTrade != null && bestTradeUtility > 0) {
+			int[] desiredSkittles = bestTrade.getDesire();
+			int[] offeredSkittles = bestTrade.getOffer();
+			
+			//This is a hack for the meantime because we cannot update if we pick our own offer
+			for (int i = 0; i < inventory.size(); i++) {
+				if (ourOffer != null && !ourOffer.equals(bestTrade)){
+					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+				}
+			}
+			
+			return bestTrade;
+		}
+		
 		return null;
 	}
 	
 	private double tradeUtility(Offer o) {
 		// TODO: compute the utility of a trade
-		return 0.0;
+		double valueIn = 0.0;
+		double valueOut = 0.0;
+		
+		// what we receive is what they are offering
+		int[] in = o.getOffer();
+		// what we send is what they want
+		int[] out = o.getDesire();
+		
+		for(int i = 0; i < in.length; i++) {
+			valueIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
+		}
+		
+		for(int j = 0; j < in.length; j++) {
+			valueOut += inventory.getSkittle(j).getValue() * Math.pow(out[j], 2);
+		}
+		
+		return valueIn - valueOut;
 	}
 
 	private boolean canTake(Offer o) {
