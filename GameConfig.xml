@@ -2,7 +2,7 @@
 <GameConfig>
 	<Game>
 		<ColorNum>5</ColorNum>
-		<SkittleNum>5</SkittleNum>
+		<SkittleNum>500</SkittleNum>
 	</Game>
 
 	<Player>
