@@ -134,24 +134,9 @@ public class KnowledgeBase {
 
 	//TODO: calculate the probability that a trade will be accepted
 	private double tradeAcceptanceProbability(Offer o) {
-		//count how many times a similar trade was accepted
-		
-		//count how many times a similar trade was rejected
+		//Sid's model
 		
 		//???, profit
-		return 0.0;
-	}
-	
-	//TODO
-	private boolean areTradesSimilar(Offer first, Offer second) {
-		//use tradeDistance, compare difference to threshold
-		return false;
-	}
-	
-	//TODO
-	private double tradeDistance(Offer first, Offer second) {
-		//normalize counts
-		//fuzzy match
 		return 0.0;
 	}
 	
