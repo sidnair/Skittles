@@ -150,8 +150,7 @@ public class Ebenezer extends Player {
 	public Offer pickOffer(Offer[] currentOffers) {
 		// We can't get the number of players another way...
 		if (kb == null) {
-			kb = new KnowledgeBase(currentOffers.length, playerIndex,
-					inventory.getSkittles().length);
+			kb = new KnowledgeBase(inventory, currentOffers.length, playerIndex);
 		}
 		
 		ArrayList<Offer> trades = new ArrayList<Offer>();
@@ -169,7 +168,7 @@ public class Ebenezer extends Player {
 		Collections.sort(trades, new Comparator<Offer>() {
 			@Override
 			public int compare(Offer first, Offer second) {
-				double diff = tradeUtility(first) - tradeUtility(second);
+				double diff = kb.tradeUtility(first) - kb.tradeUtility(second);
 				if (diff > 0) {
 					return -1;
 				} else if (diff == 0) {
@@ -181,10 +180,10 @@ public class Ebenezer extends Player {
 		});
 		
 		Offer bestTrade = trades.get(0);
-		double bestTradeUtility = tradeUtility(bestTrade);
+		double bestTradeUtility = kb.tradeUtility(bestTrade);
 		if(DEBUG) {
 			for(Offer t: trades) {
-				System.out.println(t.toString()+" = "+tradeUtility(t));
+				System.out.println(t.toString()+" = "+kb.tradeUtility(t));
 			}
 			System.out.println("bestTrade: " + bestTrade.toString() + " = " + 
 						bestTradeUtility);
@@ -210,31 +209,6 @@ public class Ebenezer extends Player {
 		}
 	}
 	
-	private double tradeUtility(Offer o) {
-		double valueIn = 0.0;
-		double valueOut = 0.0;
-		
-		// what we receive is what they are offering
-		int[] in = o.getOffer();
-		// what we send is what they want
-		int[] out = o.getDesire();
-		
-		for(int i = 0; i < in.length; i++) {
-			valueIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
-		}
-		
-		for(int j = 0; j < in.length; j++) {
-			valueOut += inventory.getSkittle(j).getValue() * Math.pow(out[j], 2);
-		}
-		
-		return valueIn - valueOut;
-	}
-	
-	private double tradeProbability(Offer o) {
-		//TODO: calculate the probability that a trade will be accepted
-		return 0.0;
-	}
-
 	private boolean canTake(Offer o) {
 		if(ourOffer != null && o.equals(ourOffer)) {
 			return false;

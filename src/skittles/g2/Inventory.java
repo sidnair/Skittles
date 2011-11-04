@@ -7,7 +7,6 @@ public class Inventory {
 	
 	private Skittle[] skittles;
 	
-	
 	public Inventory(int[] aintInHand) {
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {
@@ -47,6 +46,20 @@ public class Inventory {
 	
 	public Skittle[] getSkittles() {
 		return skittles;
+	}
+	
+	public int getNumColors() {
+		return skittles.length;
+	}
+	
+	public double[] getColorValues() {
+		double[] values = new double[skittles.length];
+		
+		for(int i = 0; i < values.length; i++) {
+			values[i] = skittles[i].getValue();
+		}
+		
+		return values;
 	}
 	
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {
