@@ -19,7 +19,6 @@ public class Ebenezer extends Player {
 	private String strClassName;
 	private int intPlayerIndex;
 	private Mouth myMouth;
-	private Sense mySense;
 	private KnowledgeBase kb;
 	private Inventory inventory;
 	private Offer ourOffer;
@@ -31,7 +30,6 @@ public class Ebenezer extends Player {
 		this.intPlayerNum = intPlayerNum;
 		inventory = new Inventory(aintInHand);
 		myMouth = new Mouth();
-		mySense = new Sense();
 		dblHappiness = 0;
 	}
 
@@ -154,7 +152,7 @@ public class Ebenezer extends Player {
 	@Override
 	public void happier(double dblHappinessUp) {
 		if (myMouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
-			double utility = mySense.getIndividualHappiness(dblHappinessUp, myMouth.howMany);
+			double utility = inventory.getIndividualHappiness(dblHappinessUp, myMouth.howMany);
 			myMouth.skittleInMouth.setValue(utility);
 		}
 	}
