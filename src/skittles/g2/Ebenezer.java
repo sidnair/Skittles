@@ -22,6 +22,7 @@ public class Ebenezer extends Player {
 	private KnowledgeBase kb;
 	private Inventory inventory;
 	private Offer ourOffer;
+	private Offer[] lastOfferSet;
 	
 	@Override
 	public void initialize(int intPlayerNum, int intPlayerIndex,
@@ -62,6 +63,10 @@ public class Ebenezer extends Player {
 	}
 	
 	public void offer(Offer offTemp) {
+		if (lastOfferSet != null) {
+			kb.updateRelativeWants(lastOfferSet);
+		}
+		lastOfferSet = null;
 		makeOffer(offTemp);
 	}
 
@@ -256,6 +261,7 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
+		lastOfferSet = aoffCurrentOffers;
 		for (Offer o : aoffCurrentOffers) {
 			if (o.getPickedByIndex() > -1) {
 				kb.storeSelectedTrade(o);
