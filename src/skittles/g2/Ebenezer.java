@@ -19,15 +19,20 @@ public class Ebenezer extends Player {
 	private String strClassName;
 	private int intPlayerIndex;
 	private Mouth myMouth;
+	private int numPlayers;
+	private String className;
+	private int playerIndex;
+	private Mouth mouth;
 	private KnowledgeBase kb;
 	private Inventory inventory;
 	private Offer ourOffer;
 	
 	@Override
-	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
-		this.intPlayerIndex = intPlayerIndex;
-		this.strClassName = strClassName;
-		this.intPlayerNum = intPlayerNum;
+	public void initialize(int intPlayerNum, int intPlayerIndex,
+			String strClassName, int[] aintInHand) {
+		this.playerIndex = intPlayerIndex;
+		this.className = strClassName;
+		this.numPlayers = intPlayerNum;
 		inventory = new Inventory(aintInHand);
 		myMouth = new Mouth();
 		dblHappiness = 0;
@@ -41,7 +46,7 @@ public class Ebenezer extends Player {
 			Skittle next = untasted.remove();
 			next.setTasted();
 			aintTempEat[next.getColor()] = 1;
-			myMouth.put(next, 1);
+			mouth.put(next, 1);
 			return;
 		}
 		/*Then eat one by one the negative values from the highest possible (hopefully
@@ -52,7 +57,7 @@ public class Ebenezer extends Player {
 			Skittle next = highestNegative.remove();
 			next.setTasted();
 			aintTempEat[next.getColor()] = 1;
-			myMouth.put(next, 1);
+			mouth.put(next, 1);
 			return;
 		}
 		//Then eat the positives by value in groups
@@ -61,7 +66,7 @@ public class Ebenezer extends Player {
 		Skittle next = skittlesByValuesLowest.remove();
 		next.setTasted();
 		aintTempEat[next.getColor()] = next.getCount();
-		myMouth.put(next, next.getCount());
+		mouth.put(next, next.getCount());
 	}
 	
 	public void offer(Offer offTemp) {
@@ -115,21 +120,9 @@ public class Ebenezer extends Player {
 		
 		//if we've tasted more than two colors, get our favorite one
 		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
-		Skittle unwantedColor = null;
 		
-		double[] marketPrefs = kb.getMarketPreferences();
-		double currentMarketValue = Double.NEGATIVE_INFINITY;
-		
-		// TODO: move to KnowledgeBase
 		// starting with third-best color, find the color with the highest market value.
-		// set it as our unwanted color.
-		for (int i = 2; i < tastedSkittles.size(); i++) {
-			double newMarketValue = marketPrefs[tastedSkittles.get(i).getColor()];
-			if (newMarketValue > currentMarketValue) {
-				unwantedColor = tastedSkittles.get(i);
-				currentMarketValue = newMarketValue;
-			}
-		}
+		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, tastedSkittles);
 
 		// if we know what color we want AND what color we don't want,
 		// set the offer to SEND unwantedColor and RECEIVE wantedColor		
@@ -139,13 +132,16 @@ public class Ebenezer extends Player {
 		if (unwantedColor != null && wantedColor != null) {
 			// TODO: why are we calculating count like this?
 			// TODO: make offers of mixed colors
-			int count = (int) Math.min(Math.ceil(unwantedColor.getCount() / 5.0), Math.ceil(wantedColor.getCount() / 5.0));
+			int count = (int) Math.min(
+					Math.ceil(unwantedColor.getCount() / 5.0),
+					Math.ceil(wantedColor.getCount() / 5.0));
 			toOffer[unwantedColor.getColor()] = count;
 			toReceive[wantedColor.getColor()] = count;
 			offTemp.setOffer(toOffer, toReceive);
 		}
 		
-		//This is a hack for the meantime because we cannot update if we pick our own offer
+		// This is a hack for the meantime because we cannot update if we pick
+		// our own offer.
 		ourOffer = offTemp;
 	}
 
@@ -161,7 +157,7 @@ public class Ebenezer extends Player {
 	public Offer pickOffer(Offer[] currentOffers) {
 		// We can't get the number of players another way...
 		if (kb == null) {
-			kb = new KnowledgeBase(currentOffers.length, intPlayerIndex, inventory.getSkittles().length);
+			kb = new KnowledgeBase(inventory, currentOffers.length, playerIndex);
 		}
 		
 		ArrayList<Offer> trades = new ArrayList<Offer>();
@@ -179,7 +175,7 @@ public class Ebenezer extends Player {
 		Collections.sort(trades, new Comparator<Offer>() {
 			@Override
 			public int compare(Offer first, Offer second) {
-				double diff = tradeUtility(first) - tradeUtility(second);
+				double diff = kb.tradeUtility(first) - kb.tradeUtility(second);
 				if (diff > 0) {
 					return -1;
 				} else if (diff == 0) {
@@ -191,50 +187,40 @@ public class Ebenezer extends Player {
 		});
 		
 		Offer bestTrade = trades.get(0);
-		double bestTradeUtility = tradeUtility(bestTrade);
+		double bestTradeUtility = kb.tradeUtility(bestTrade);
 		if(DEBUG) {
-			for(Offer t: trades) System.out.println(t.toString()+" = "+tradeUtility(t));
-			System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+			for(Offer t: trades) {
+				System.out.println(t.toString()+" = "+kb.tradeUtility(t));
+			}
+			System.out.println("bestTrade: " + bestTrade.toString() + " = " + 
+						bestTradeUtility);
 		}
 		if(bestTrade != null && bestTradeUtility > 0) {
-			int[] desiredSkittles = bestTrade.getDesire();
-			int[] offeredSkittles = bestTrade.getOffer();
-			
-			//This is a hack for the meantime because we cannot update if we pick our own offer
-			for (int i = 0; i < inventory.size(); i++) {
-				if (ourOffer != null && !ourOffer.equals(bestTrade)){
-					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
-				}
-			}
-			
+			takeTrade(bestTrade);
 			return bestTrade;
 		}
 		
 		return null;
 	}
-	
-	private double tradeUtility(Offer o) {
-		// TODO: compute the utility of a trade
-		double valueIn = 0.0;
-		double valueOut = 0.0;
-		
-		// what we receive is what they are offering
-		int[] in = o.getOffer();
-		// what we send is what they want
-		int[] out = o.getDesire();
-		
-		for(int i = 0; i < in.length; i++) {
-			valueIn += inventory.getSkittle(i).getValue() * Math.pow(in[i], 2);
-		}
-		
-		for(int j = 0; j < in.length; j++) {
-			valueOut += inventory.getSkittle(j).getValue() * Math.pow(out[j], 2);
-		}
-		
-		return valueIn - valueOut;
-	}
 
+	/**
+	 * update counts based on the trade we're accepting
+	 * @param bestTrade
+	 */
+	private void takeTrade(Offer bestTrade) {
+		int[] desiredSkittles = bestTrade.getDesire();
+		int[] offeredSkittles = bestTrade.getOffer();
+		
+		for (int i = 0; i < inventory.size(); i++) {
+			inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+		}
+	}
+	
 	private boolean canTake(Offer o) {
+		if(ourOffer != null && o.equals(ourOffer)) {
+			return false;
+		}
+		
 		int[] offered = o.getOffer();
 		int[] desired = o.getDesire();
 		
@@ -273,12 +259,12 @@ public class Ebenezer extends Player {
 
 	@Override
 	public String getClassName() {
-		return strClassName;
+		return className;
 	}
 
 	@Override
 	public int getPlayerIndex() {
-		return intPlayerIndex;
+		return playerIndex;
 	}
 
 	// For debug mode apparently
