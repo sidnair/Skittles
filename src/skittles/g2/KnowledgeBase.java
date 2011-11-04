@@ -81,6 +81,8 @@ public class KnowledgeBase {
 		}
 		mergeWants(tempRelativeWants);
 		
+//		System.out.println(";;;;;;;;;;");
+//		System.out.println(selfIndex);
 //		System.out.println(Arrays.deepToString(relativeWants.get(selfIndex)));
 	}
 	
