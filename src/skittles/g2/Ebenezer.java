@@ -112,21 +112,9 @@ public class Ebenezer extends Player {
 		
 		//if we've tasted more than two colors, get our favorite one
 		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
-		Skittle unwantedColor = null;
 		
-		double[] marketPrefs = kb.getMarketPreferences();
-		double currentMarketValue = Double.NEGATIVE_INFINITY;
-		
-		// TODO: move to KnowledgeBase
 		// starting with third-best color, find the color with the highest market value.
-		// set it as our unwanted color.
-		for (int i = 2; i < tastedSkittles.size(); i++) {
-			double newMarketValue = marketPrefs[tastedSkittles.get(i).getColor()];
-			if (newMarketValue > currentMarketValue) {
-				unwantedColor = tastedSkittles.get(i);
-				currentMarketValue = newMarketValue;
-			}
-		}
+		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, tastedSkittles);
 
 		// if we know what color we want AND what color we don't want,
 		// set the offer to SEND unwantedColor and RECEIVE wantedColor		
@@ -221,7 +209,6 @@ public class Ebenezer extends Player {
 	}
 	
 	private double tradeUtility(Offer o) {
-		// TODO: compute the utility of a trade
 		double valueIn = 0.0;
 		double valueOut = 0.0;
 		
