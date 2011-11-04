@@ -133,10 +133,17 @@ public class KnowledgeBase {
 	}
 
 	//TODO: calculate the probability that a trade will be accepted
-	private double tradeAcceptanceProbability(Offer o) {
+	public double tradeAcceptanceProbability(Offer o) {
 		//Sid's model
 		
 		//???, profit
+		return 0.0;
+	}
+	
+	//TODO
+	public double countProbability(int count, int color, int player) {
+		//p players, c colors, n skittles per player
+		
 		return 0.0;
 	}
 	
