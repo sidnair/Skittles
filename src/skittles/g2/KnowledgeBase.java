@@ -10,7 +10,8 @@ import skittles.sim.Offer;
  * are interested in getting. 
  */
 public class KnowledgeBase {
-
+	
+	private Inventory inventory;
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
@@ -18,7 +19,6 @@ public class KnowledgeBase {
 	
 	private ArrayList<double[][]> relativeWants;
 	
-	private int skittleCount;
 	private int playerCount;
 	
 	private final static double WANTS_NEW_WEIGHT = 0.5;
@@ -28,19 +28,19 @@ public class KnowledgeBase {
 	 */
 	private int selfIndex;
 	
-	
-	public KnowledgeBase(int playerCount, int selfIndex, int skittleCount) {
-		successfulOffers = new ArrayList<Offer>();
-		unsuccessfulOffers = new ArrayList<Offer>();
+	public KnowledgeBase(Inventory inventory, int playerCount, int selfIndex) {
+		this.inventory = inventory;
+		this.successfulOffers = new ArrayList<Offer>();
+		this.unsuccessfulOffers = new ArrayList<Offer>();
 		this.selfIndex = selfIndex;
 		this.playerCount = playerCount;
-		this.skittleCount = skittleCount;
 		playerHistories = new ArrayList<PreferenceHistory>();
 		for (int i = 0; i < playerCount; i++) {
-			playerHistories.add(new PreferenceHistory(skittleCount));
+			playerHistories.add(new PreferenceHistory(inventory.getNumColors()));
 		}
-		marketHistory = new PreferenceHistory(skittleCount);
+
 		relativeWants = getRelativeWants();
+		marketHistory = new PreferenceHistory(inventory.getNumColors());
 	}
 	
 	public void storeUnselectedTrade(Offer offer) {
@@ -59,6 +59,7 @@ public class KnowledgeBase {
 		ArrayList<double[][]> relativeWants =
 				new ArrayList<double[][]>(playerCount); 
 		for (int i = 0; i < playerCount; i++) {
+			int skittleCount = inventory.getNumColors();
 			relativeWants.add(new double[skittleCount][skittleCount]);
 		}
 		return relativeWants;
@@ -186,6 +187,43 @@ public class KnowledgeBase {
 			}
 		}
 		return unwantedColor;
+	}
+	
+	public double tradeUtility(Offer o) {
+		double valueIn = 0.0;
+		double valueOut = 0.0;
+		
+		// what we receive is what they are offering
+		int[] in = o.getOffer();
+		// what we send is what they want
+		int[] out = o.getDesire();
+		
+		double[] colorValues = inventory.getColorValues();
+		
+		for(int i = 0; i < in.length; i++) {
+			valueIn += colorValues[i] * Math.pow(in[i], 2);
+		}
+		
+		for(int j = 0; j < in.length; j++) {
+			valueOut += colorValues[j] * Math.pow(out[j], 2);
+		}
+		
+		return valueIn - valueOut;
+	}
+
+	//TODO: calculate the probability that a trade will be accepted
+	public double tradeAcceptanceProbability(Offer o) {
+		//Sid's model
+		
+		//???, profit
+		return 0.0;
+	}
+	
+	//TODO
+	public double countProbability(int count, int color, int player) {
+		//p players, c colors, n skittles per player
+		
+		return 0.0;
 	}
 	
 }
