@@ -210,7 +210,6 @@ public class Ebenezer extends Player {
 	}
 	
 	private double tradeUtility(Offer o) {
-		// TODO: compute the utility of a trade
 		double valueIn = 0.0;
 		double valueOut = 0.0;
 		
