@@ -190,22 +190,24 @@ public class Ebenezer extends Player {
 						bestTradeUtility);
 		}
 		if(bestTrade != null && bestTradeUtility > 0) {
-			int[] desiredSkittles = bestTrade.getDesire();
-			int[] offeredSkittles = bestTrade.getOffer();
-			
-			// This is a hack for the meantime because we cannot update if we
-			// pick our own offer.
-			for (int i = 0; i < inventory.size(); i++) {
-				if (ourOffer != null && !ourOffer.equals(bestTrade)){
-					inventory.getSkittle(i).updateCount(
-							offeredSkittles[i] - desiredSkittles[i]);
-				}
-			}
-			
+			takeTrade(bestTrade);
 			return bestTrade;
 		}
 		
 		return null;
+	}
+
+	/**
+	 * update counts based on the trade we're accepting
+	 * @param bestTrade
+	 */
+	private void takeTrade(Offer bestTrade) {
+		int[] desiredSkittles = bestTrade.getDesire();
+		int[] offeredSkittles = bestTrade.getOffer();
+		
+		for (int i = 0; i < inventory.size(); i++) {
+			inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+		}
 	}
 	
 	private double tradeUtility(Offer o) {
@@ -229,6 +231,10 @@ public class Ebenezer extends Player {
 	}
 
 	private boolean canTake(Offer o) {
+		if(ourOffer != null && o.equals(ourOffer)) {
+			return false;
+		}
+		
 		int[] offered = o.getOffer();
 		int[] desired = o.getDesire();
 		
