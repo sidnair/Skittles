@@ -14,6 +14,10 @@ public class Inventory {
 		}
 	}
 	
+	public double getIndividualHappiness(double happiness, int count) {
+		return (happiness / (Math.sqrt(count * 1.0)));
+	}
+	
 	/* This would return true only for the skittle with the highest score currently */
 	public boolean isWorthHoarding(int color) {
 		for (int i = 0; i < skittles.length; i++) {
