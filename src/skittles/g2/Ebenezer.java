@@ -24,7 +24,8 @@ public class Ebenezer extends Player {
 	private Offer ourOffer;
 	
 	@Override
-	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
+	public void initialize(int intPlayerNum, int intPlayerIndex,
+			String strClassName, int[] aintInHand) {
 		this.playerIndex = intPlayerIndex;
 		this.className = strClassName;
 		this.numPlayers = intPlayerNum;
@@ -43,7 +44,8 @@ public class Ebenezer extends Player {
 			mouth.put(next, 1);
 			return;
 		}
-		PriorityQueue<Skittle> highestNegative = inventory.leastNegativeSkittles();
+		PriorityQueue<Skittle> highestNegative =
+				inventory.leastNegativeSkittles();
 		if (!highestNegative.isEmpty()) {
 			Skittle next = highestNegative.remove();
 			next.setTasted();
@@ -51,7 +53,8 @@ public class Ebenezer extends Player {
 			mouth.put(next, 1);
 			return;
 		}
-		PriorityQueue<Skittle> skittlesByValuesLowest = inventory.skittlesByValuesLowest();
+		PriorityQueue<Skittle> skittlesByValuesLowest =
+				inventory.skittlesByValuesLowest();
 		Skittle next = skittlesByValuesLowest.remove();
 		next.setTasted();
 		aintTempEat[next.getColor()] = next.getCount();
@@ -133,20 +136,24 @@ public class Ebenezer extends Player {
 		if (unwantedColor != null && wantedColor != null) {
 			// TODO: why are we calculating count like this?
 			// TODO: make offers of mixed colors
-			int count = (int) Math.min(Math.ceil(unwantedColor.getCount() / 5.0), Math.ceil(wantedColor.getCount() / 5.0));
+			int count = (int) Math.min(
+					Math.ceil(unwantedColor.getCount() / 5.0),
+					Math.ceil(wantedColor.getCount() / 5.0));
 			toOffer[unwantedColor.getColor()] = count;
 			toReceive[wantedColor.getColor()] = count;
 			offTemp.setOffer(toOffer, toReceive);
 		}
 		
-		//This is a hack for the meantime because we cannot update if we pick our own offer
+		// This is a hack for the meantime because we cannot update if we pick
+		// our own offer.
 		ourOffer = offTemp;
 	}
 
 	@Override
 	public void happier(double dblHappinessUp) {
 		if (mouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
-			double utility = sense.getIndividualHappiness(dblHappinessUp, mouth.howMany);
+			double utility = sense.getIndividualHappiness(dblHappinessUp,
+					mouth.howMany);
 			mouth.skittleInMouth.setValue(utility);
 		}
 	}
@@ -155,7 +162,8 @@ public class Ebenezer extends Player {
 	public Offer pickOffer(Offer[] currentOffers) {
 		// We can't get the number of players another way...
 		if (kb == null) {
-			kb = new KnowledgeBase(currentOffers.length, playerIndex, inventory.getSkittles().length);
+			kb = new KnowledgeBase(currentOffers.length, playerIndex,
+					inventory.getSkittles().length);
 		}
 		
 		ArrayList<Offer> trades = new ArrayList<Offer>();
@@ -187,17 +195,22 @@ public class Ebenezer extends Player {
 		Offer bestTrade = trades.get(0);
 		double bestTradeUtility = tradeUtility(bestTrade);
 		if(DEBUG) {
-			for(Offer t: trades) System.out.println(t.toString()+" = "+tradeUtility(t));
-			System.out.println("bestTrade: "+bestTrade.toString()+" = "+bestTradeUtility);
+			for(Offer t: trades) {
+				System.out.println(t.toString()+" = "+tradeUtility(t));
+			}
+			System.out.println("bestTrade: " + bestTrade.toString() + " = " + 
+						bestTradeUtility);
 		}
 		if(bestTrade != null && bestTradeUtility > 0) {
 			int[] desiredSkittles = bestTrade.getDesire();
 			int[] offeredSkittles = bestTrade.getOffer();
 			
-			//This is a hack for the meantime because we cannot update if we pick our own offer
+			// This is a hack for the meantime because we cannot update if we
+			// pick our own offer.
 			for (int i = 0; i < inventory.size(); i++) {
 				if (ourOffer != null && !ourOffer.equals(bestTrade)){
-					inventory.getSkittle(i).updateCount(offeredSkittles[i] - desiredSkittles[i]);
+					inventory.getSkittle(i).updateCount(
+							offeredSkittles[i] - desiredSkittles[i]);
 				}
 			}
 			
