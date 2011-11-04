@@ -7,7 +7,6 @@ public class Inventory {
 	
 	private Skittle[] skittles;
 	
-	
 	public Inventory(int[] aintInHand) {
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {

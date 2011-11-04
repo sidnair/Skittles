@@ -9,19 +9,9 @@ import skittles.sim.Offer;
  * are interested in getting. 
  */
 public class KnowledgeBase {
-	
-	// TODO - detect messages
-	// TODO - see what trades people skipped
-	// TODO - account for fact that people might not know color?
-	
-	// TODO - store stores trades in 'rounds'
-	
-	// TODO - keep track of trades that are 'bad' (being ignored) in a way that
-	// allows us to make better trades
 	// TODO - better decay for market preference?
 	
-	// NOTE - even distributions of skittles are per player
-	
+	// NOTE - even distributions of skittles are per player	
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
