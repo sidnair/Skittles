@@ -229,6 +229,11 @@ public class Ebenezer extends Player {
 		
 		return valueIn - valueOut;
 	}
+	
+	private double tradeProbability(Offer o) {
+		//TODO: calculate the probability that a trade will be accepted
+		return 0.0;
+	}
 
 	private boolean canTake(Offer o) {
 		if(ourOffer != null && o.equals(ourOffer)) {
