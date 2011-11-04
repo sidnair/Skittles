@@ -9,13 +9,10 @@ import skittles.sim.Offer;
  * are interested in getting. 
  */
 public class KnowledgeBase {
-	// TODO - better decay for market preference?
-	
-	// NOTE - even distributions of skittles are per player	
+		
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
-	
 	private PreferenceHistory marketHistory;
 		
 	/**
