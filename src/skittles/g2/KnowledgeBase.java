@@ -16,7 +16,11 @@ public class KnowledgeBase {
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
 	private PreferenceHistory marketHistory;
-	
+
+	/**
+	 * Each relative want: rows are the things that they would gain.
+	 * Columns are the things they are giving up.
+	 */
 	private ArrayList<double[][]> relativeWants;
 	
 	private int playerCount;
@@ -80,10 +84,6 @@ public class KnowledgeBase {
 					o.getDesire());
 		}
 		mergeWants(tempRelativeWants);
-		
-//		System.out.println(";;;;;;;;;;");
-//		System.out.println(selfIndex);
-//		System.out.println(Arrays.deepToString(relativeWants.get(selfIndex)));
 	}
 	
 	private void mergeWants(ArrayList<double[][]> tempRelativeWants) {
@@ -123,16 +123,12 @@ public class KnowledgeBase {
 		if (givenRatios == null || gainedRatios == null) {
 			return;
 		}
-		
+
 		for (int i = 0; i < givenRatios.length; i++) {
 			for (int j = 0; j < gainedRatios.length; j++) {
-				// TODO - tweak
-				if (i == j || gainedRatios[i] == 0 || givenRatios[j] == 0) {
-					playerWants[i][j] = 0;	
-				} else if (i < j) {
-					playerWants[i][j] = -gainedRatios[i] / givenRatios[j];
-				} else {
-					playerWants[i][j] = gainedRatios[i] / givenRatios[j];
+				if (gainedRatios[i] != 0 && givenRatios[j] != 0) {
+					playerWants[i][j] += gainedRatios[i] / givenRatios[j];
+					playerWants[j][i] += -gainedRatios[i] / givenRatios[j];
 				}
 			}
 		}
