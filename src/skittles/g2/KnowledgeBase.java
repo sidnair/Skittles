@@ -86,5 +86,27 @@ public class KnowledgeBase {
 	public double[] getPlayerPreferences(int i) {
 		return playerHistories.get(i).getPreferences();
 	}
+
+	/**
+	 * @param tastedSkittles
+	 * @return
+	 */
+	public Skittle getHighestMarketValueColorFrom(
+			int start,
+			ArrayList<Skittle> tastedSkittles) {
+		Skittle unwantedColor = null;
+		double[] marketPrefs = this.getMarketPreferences();
+		double currentMarketValue = Double.NEGATIVE_INFINITY;
+		double newMarketValue = 0.0;
+		
+		for (int i = start; i < tastedSkittles.size(); i++) {
+			newMarketValue = marketPrefs[tastedSkittles.get(i).getColor()];
+			if (newMarketValue > currentMarketValue) {
+				unwantedColor = tastedSkittles.get(i);
+				currentMarketValue = newMarketValue;
+			}
+		}
+		return unwantedColor;
+	}
 	
 }
