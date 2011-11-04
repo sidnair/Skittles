@@ -59,6 +59,28 @@ public class KnowledgeBase {
 		}
 	}
 	
+	// giving is what they are giving
+	// taking is what they are taking
+	public double getOtherHappiness(int[] giving, int[] taking, 
+			int playerIndex) {
+		double[][] desires = relativeWants.get(playerIndex);
+		double[] takingRatios = getRatios(taking);
+		double value = 0;
+
+		for (int i = 0; i < inventory.getNumColors(); i++) {
+			if (giving[i] == 0) {
+				continue;
+			}
+			for (int j = 0; j < inventory.getNumColors(); j++) {
+				if (takingRatios[j] == 0) {
+					continue;
+				}
+				value += giving[i] * takingRatios[j] * desires[i][j];
+			}
+		}
+		return value;
+	}
+	
 	private ArrayList<double[][]> getRelativeWants() {
 		ArrayList<double[][]> relativeWants =
 				new ArrayList<double[][]>(playerCount); 
@@ -84,6 +106,18 @@ public class KnowledgeBase {
 					o.getDesire());
 		}
 		mergeWants(tempRelativeWants);
+		
+		for (Offer o : offers) {
+			if (o.getPickedByIndex() != -1) {
+				for (int i : o.getDesire()) {
+					if (i > 0) {
+						getOtherHappiness(o.getDesire(), o.getOffer(),
+								o.getPickedByIndex());
+						break;
+					}
+				}
+			}
+		}
 	}
 	
 	private void mergeWants(ArrayList<double[][]> tempRelativeWants) {
@@ -127,8 +161,8 @@ public class KnowledgeBase {
 		for (int i = 0; i < givenRatios.length; i++) {
 			for (int j = 0; j < gainedRatios.length; j++) {
 				if (gainedRatios[i] != 0 && givenRatios[j] != 0) {
-					playerWants[i][j] += gainedRatios[i] / givenRatios[j];
-					playerWants[j][i] += -gainedRatios[i] / givenRatios[j];
+					playerWants[j][i] += gainedRatios[i] / givenRatios[j];
+					playerWants[i][j] -= gainedRatios[i] / givenRatios[j];
 				}
 			}
 		}

@@ -66,14 +66,7 @@ public class Ebenezer extends Player {
 
 	public void offer(Offer offTemp) {
 		if (lastOfferSet != null) {
-			for (int i = 0; i < lastOfferSet.length; i++ ) {
-				if (lastOfferSet[i].getPickedByIndex() == playerIndex ||
-						(lastOfferSet[i].getOfferedByIndex() == playerIndex 
-						&& lastOfferSet[i].getPickedByIndex() != -1)) {
-					kb.updateRelativeWants(lastOfferSet);
-					break;
-				}
-			}
+			kb.updateRelativeWants(lastOfferSet);
 		}
 		lastOfferSet = null;
 		makeOffer(offTemp);
