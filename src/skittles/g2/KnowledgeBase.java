@@ -33,6 +33,8 @@ public class KnowledgeBase {
 
 	private double[][] estimatedCount;
 	private int turn;
+	private enum STAGE {DISCOVERY, HOARD, END}
+	private STAGE[] playerStage;
 
 	private PreferenceHistory marketHistory;
 
@@ -53,6 +55,10 @@ public class KnowledgeBase {
 
 	public KnowledgeBase(Inventory inventory, int playerCount, int selfIndex) {
 		this.playerCount = playerCount;
+		playerStage = new STAGE[playerCount];
+		for (STAGE s: playerStage) {
+			s = STAGE.DISCOVERY;
+		}
 		this.inventory = inventory;
 		this.successfulOffers = new ArrayList<Offer>();
 		this.unsuccessfulOffers = new ArrayList<Offer>();
@@ -294,22 +300,34 @@ public class KnowledgeBase {
 					}
 				}
 			}
+			return;
 		}
 		if (turn > inventory.size()) {
-			for (int j = 0; j < playerCount; j++) {
-				int zeroCount = 0;
-				for (int i = 0; i < inventory.size(); i++) {
-					if (estimatedCount[j][i] <= 0) {
-						zeroCount++;
-					}
-				}
-				for (int i = 0; i < inventory.size(); i++) {
-					if (estimatedCount[j][i] > 0) {
-						estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
-					}
+			for (STAGE s: playerStage) {
+				if (s == STAGE.DISCOVERY) {
+					s = STAGE.HOARD;
 				}
 			}
-		}
+		}	
+			for (int j = 0; j < playerCount; j++) {
+				if (playerStage[j] == STAGE.HOARD) {
+					int zeroCount = 0;
+					for (int i = 0; i < inventory.size(); i++) {
+						if (estimatedCount[j][i] <= 0) {
+							zeroCount++;
+						}
+					}
+					for (int i = 0; i < inventory.size(); i++) {
+						if (estimatedCount[j][i] > 0) {
+							estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
+						}
+					}
+				}
+				if (playerStage[j] == STAGE.END) {
+					;
+					//The heuristic of not trading means eating doesn't work.. rethinking
+				}
+			}
 		turn++;
 	}
 
@@ -319,6 +337,7 @@ public class KnowledgeBase {
 		for (int i = 0; i < inventory.size(); i++) {
 			estimatedCount[selector][i] += o.getOffer()[i];
 			estimatedCount[proposer][i] -= o.getOffer()[i];
+			
 			estimatedCount[selector][i] -= o.getDesire()[i];
 			estimatedCount[proposer][i] += o.getDesire()[i];
 
