@@ -8,16 +8,16 @@
 	<Player>
 		<Class>skittles.g2.Ebenezer</Class>
 		<Happiness>0.8, -0.2, 0.4, 0.1, -0.5</Happiness>
-		<InHand>6,6,6,6,6</InHand>
+		<InHand>random</InHand>
 	</Player>
 	<Player>
-		<Class>skittles.g2.Ebenezer</Class>
+		<Class>skittles.dumpplayer.DumpPlayer</Class>
 		<Happiness>-0.5, -0.2, 0.4, 0.8, 0.1</Happiness>
-		<InHand>6,6,6,6,6</InHand>
+		<InHand>random</InHand>
 	</Player>
 	<Player>
-		<Class>skittles.g2.Ebenezer</Class>
+		<Class>skittles.dumpplayer.DumpPlayer</Class>
 		<Happiness>-0.5, -0.2, 0.8, 0.4, 0.1</Happiness>
-		<InHand>6,6,6,6,6</InHand>
+		<InHand>random</InHand>
 	</Player>
 </GameConfig>

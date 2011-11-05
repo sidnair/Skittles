@@ -29,13 +29,6 @@ public class Game
 	
 	public static Scanner scnInput = new Scanner( System.in );
 	
-	private int getSeed() {
-		// NOTE: this seed is constant for deterministic testing purposes!
-		// set it to (something non-constant) for actual simulation!
-		return 1234567;
-		//return (new Random(System.currentTimeMillis())).nextInt();
-	}
-	
 	public Game( String strXMLPath )
 	{
 		DocumentBuilderFactory dbfGameConfig = DocumentBuilderFactory.newInstance();
@@ -102,7 +95,7 @@ public class Game
 					System.out.println( "Random color happiness:" );
 					for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 					{
-						System.out.print( adblTastes[ intColorIndex ] + " " );
+						System.out.print( adblTastes[ intColorIndex ] );
 					}
 					System.out.println();
 				}
@@ -336,7 +329,7 @@ public class Game
 	private double[] randomTastes(double dblMean) 
 	{
 		double[] adblRandomTastes = new double[ intColorNum ];
-		Random rdmTemp = new Random(getSeed());
+		Random rdmTemp = new Random();
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
 			double dblTemp = -5;		// out of range [ -1, 1 ]
@@ -367,7 +360,7 @@ public class Game
 ////			System.out.print( aintRandomInHand[ intColorIndex ] + " " );
 //		}
 //		System.out.println();
-		Random rdmTemp = new Random(getSeed());
+		Random rdmTemp = new Random();
 		for ( int intSkittleIndex = 0; intSkittleIndex < intTotalNum; intSkittleIndex ++ )
 		{
 			int intTemp = rdmTemp.nextInt( intColorNum );
@@ -493,7 +486,7 @@ public class Game
 			alPlayerIndices.add( intPlayerIndex );
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
-		Random rdmGenerator = new Random(getSeed());
+		Random rdmGenerator = new Random();
 		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{

@@ -4,3 +4,27 @@ http://www.cs.columbia.edu/~kar/4444f11/node19.html.
 Group 2
 
 Authors: Hans Hyttinen, Eli Katz, Sid Nair
+
+Some notes:
+- distributions are uniform per player, not for a bag
+
+Testing stuff:
+  Here's how to run stuff:
+  1) run everything from the root directory of the repo.
+  2) run scripts/install-hooks.sh to set the pre-commit script to run on commit.
+  You'll need to run it again if the pre-commit script is changed.
+  3) You can run scripts/pre-commit if you want to check if you'd pass the
+  regression test without committing.
+  4) To add tests, you just add a config file to configs/. Run
+  scripts/clean-tests.sh to remove the old results. Use descriptive names.
+  GameConfig.xml is just a dumb example.
+
+  Notes:
+  1) It says there's a regression if you score under 0 even if it's a higher
+  score than before.
+  2) If it's failing too often because of random variation, change threshold in
+  the results analyzer.
+  3) If you get an error about old and new scores not being aligned, you
+  probably need to run scripts/clean-tests.sh.
+  4) If the hook is preventing you from submitting an important commit, run it
+  with the \--no-verify option (http://book.git-scm.com/5_git_hooks.html)

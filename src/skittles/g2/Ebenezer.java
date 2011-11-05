@@ -14,12 +14,6 @@ public class Ebenezer extends Player {
 
 	public static final boolean DEBUG = true;
 
-	private double dblHappiness;
-	private int intPlayerNum;
-	private String strClassName;
-	private int intPlayerIndex;
-	private Mouth myMouth;
-	private int numPlayers;
 	private String className;
 	private int playerIndex;
 	private Mouth mouth;
@@ -27,14 +21,14 @@ public class Ebenezer extends Player {
 	private Inventory inventory;
 	private Offer ourOffer;
 
+	private Offer[] lastOfferSet;
+
 	@Override
 	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
 		this.playerIndex = intPlayerIndex;
 		this.className = strClassName;
-		this.numPlayers = intPlayerNum;
 		inventory = new Inventory(aintInHand);
 		mouth = new Mouth();
-		dblHappiness = 0;
 	}
 
 	@Override
@@ -77,6 +71,10 @@ public class Ebenezer extends Player {
 	}
 
 	public void offer(Offer offTemp) {
+		if (lastOfferSet != null) {
+			kb.updateRelativeWants(lastOfferSet);
+		}
+		lastOfferSet = null;
 		makeOffer(offTemp);
 	}
 
@@ -261,6 +259,7 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void updateOfferExe(Offer[] aoffCurrentOffers) {
+		lastOfferSet = aoffCurrentOffers;
 		for (Offer o : aoffCurrentOffers) {
 			if (o.getPickedByIndex() > -1) {
 				kb.storeSelectedTrade(o);
