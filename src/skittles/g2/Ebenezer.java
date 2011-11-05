@@ -39,6 +39,12 @@ public class Ebenezer extends Player {
 
 	@Override
 	public void eat(int[] aintTempEat) {
+		//Update everyone else's count
+		if (kb != null) {
+			kb.updateCountByTurn();
+			kb.printEstimateCount();
+		}
+		
 		// First try tasting what you dont know
 		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();
 		if (!untasted.isEmpty()) {
@@ -160,11 +166,13 @@ public class Ebenezer extends Player {
 
 	@Override
 	public Offer pickOffer(Offer[] currentOffers) {
+
 		// We can't get the number of players another way...
 		if (kb == null) {
 			kb = new KnowledgeBase(inventory, currentOffers.length, playerIndex);
 		}
-
+		
+		
 		ArrayList<Offer> trades = new ArrayList<Offer>();
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
@@ -256,6 +264,7 @@ public class Ebenezer extends Player {
 		for (Offer o : aoffCurrentOffers) {
 			if (o.getPickedByIndex() > -1) {
 				kb.storeSelectedTrade(o);
+				kb.updateCountByOffer(o);
 			} else {
 				kb.storeUnselectedTrade(o);
 			}

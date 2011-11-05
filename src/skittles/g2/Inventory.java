@@ -6,12 +6,19 @@ import java.util.PriorityQueue;
 public class Inventory {
 	
 	private Skittle[] skittles;
+	private int startingSkittles;
 	
 	public Inventory(int[] aintInHand) {
+		startingSkittles = 0;
 		skittles = new Skittle[aintInHand.length];
 		for (int i = 0; i < skittles.length; i++) {
 			skittles[i] = new Skittle(aintInHand[i], i);
+			this.startingSkittles += aintInHand[i];
 		}
+	}
+	
+	public int getStartingSkittles() {
+		return startingSkittles;
 	}
 	
 	public double getIndividualHappiness(double happiness, int count) {
