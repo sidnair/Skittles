@@ -103,7 +103,7 @@ public class Game
 					System.out.println( "Random color happiness:" );
 					for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 					{
-						System.out.print( adblTastes[ intColorIndex ] + " " );
+						System.out.printf("%.2f\t", adblTastes[ intColorIndex ]);
 					}
 					System.out.println();
 				}
@@ -494,13 +494,13 @@ public class Game
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
 		Random rdmGenerator = new Random(getSeed());
-		System.out.println( "Random order is:" );
+//		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
 			int intRandom = rdmGenerator.nextInt( intPlayerNum - intPlayerIndex );
 			aintOrder[ intPlayerIndex ] = alPlayerIndices.get( intRandom );
 			alPlayerIndices.remove( intRandom );
-			System.out.print( aintOrder[ intPlayerIndex ] + " " );
+//			System.out.print( aintOrder[ intPlayerIndex ] + " " );
 		}
 		System.out.println( "\n" );
 		return aintOrder;

@@ -77,9 +77,9 @@ public class Eater {
 		for (int i = 0 ; i != colors ; ++i)
 			eating[i] = 0;
 		eating[whichColor] = howMany;
-		Util.print(info.preference);
-		Util.print(eating);
-		Util.print(info.hand);
+//		Util.print(info.preference);
+//		Util.print(eating);
+//		Util.print(info.hand);
 		System.out.println(whichColor + " " + howMany);
 	}
 }

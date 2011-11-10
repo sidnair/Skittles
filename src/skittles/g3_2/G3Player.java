@@ -12,8 +12,7 @@ public class G3Player extends skittles.sim.Player {
 		// eat.
 		eater.decideToEat(aintTempEat);
 		info.setEating(aintTempEat);
-		System.out.println("Hoarding:" + info.pile.hoarding);
-		System.out.println("Trading:" + info.pile.trading);
+
 	}
 
 	public void offer(Offer offTemp) {

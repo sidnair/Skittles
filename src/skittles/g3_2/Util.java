@@ -106,14 +106,15 @@ public class Util {
 		int[] ranks = index(values);
 		print(values);
 		for (int i = 0; i < ranks.length; i++)
-			System.out.print(values[ranks[i]] + " ");
+			;
+//			System.out.print(values[ranks[i]] + " ");
 	}
 
 	public static void print(double[] val) {
-		System.out.println(toString(val));
+//		System.out.println(toString(val));
 	}
 
 	public static void print(int[] val) {
-		System.out.println(toString(val));
+//		System.out.println(toString(val));
 	}
 }
