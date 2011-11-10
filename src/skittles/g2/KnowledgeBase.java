@@ -513,4 +513,8 @@ public class KnowledgeBase {
 		ret += "]";
 		return ret;
 	}
+	
+	public boolean isActive(int player) {
+		return playerStage[player] != STAGE.END;
+	}
 }

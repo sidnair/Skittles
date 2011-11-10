@@ -153,7 +153,7 @@ public class Ebenezer extends Player {
 			ArrayList<Skittle> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
-			if (i == playerIndex || kb.isInactive(i)) {
+			if (i == playerIndex || kb.isActive(i)) {
 				continue;
 			}
 			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
