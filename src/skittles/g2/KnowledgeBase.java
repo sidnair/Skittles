@@ -2,6 +2,9 @@
 package skittles.g2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import skittles.sim.Game;
 import skittles.sim.Offer;
@@ -92,7 +95,6 @@ public class KnowledgeBase {
 			marketHistory.addUnsuccessfulTrade(offer.getOffer(), offer.getDesire());
 		}
 	}
-
 	
 	// giving is what they are giving
 	// taking is what they are taking
@@ -124,6 +126,66 @@ public class KnowledgeBase {
 			relativeWants.add(new double[skittleCount][skittleCount]);
 		}
 		return relativeWants;
+	}
+	
+	public Offer getIntersectingOffer(ArrayList<Skittle> want,
+			ArrayList<Skittle> giveUp, int p, int playerIndex) {
+		int skittleCount = inventory.getNumColors();
+		Offer o = new Offer(playerIndex, skittleCount);
+		int[] toGive = new int[skittleCount];
+		int[] toRequest = new int[skittleCount];
+		
+		ArrayList<Score> goodTrades;
+		HashMap<Integer, Integer> colorToCount;
+		
+		for (int i = 0; i < skittleCount; i++) {
+			for (int j = 0; j < i; j++) {
+				// i = what they are giving, j = what they are taking;
+				// positive score means they like it
+				double theirVal = relativeWants.get(p)[i][j];
+				if (theirVal > 0 && want.contains(i) &&
+						giveUp.contains(j)) {
+					goodTrades.add(new Score(theirVal, j, i));
+					colorToCount.put(i, Math.min(
+							getPlayerCount(i),
+							ourCount(i));
+					colorToCount.put(j, Math.min(
+							getPlayerCount(j),
+							ourCount(j));
+				}
+			}
+		}
+		Collections.sort(goodTrades);
+		for (Score s : goodTrades) {
+			int count = Math.max( 
+				Math.min(colorToCount.get(s.toGive), colorToCount.get(s.toTake)),
+				0);
+			colorToCount.put(s.toGive, colorToCount.get(s.toGive) - count);
+			colorToCount.put(s.toTake, colorToCount.get(s.toTake) - count);
+			toGive[s.toGive] += count;
+			toGive[s.toTake] += count;
+		}
+		o.setOffer(toGive, toRequest);
+		return o;
+	}
+	
+	private class Score implements Comparable<Score> {
+		private double score;
+		private int toGive;
+		private int toTake;
+		
+		// to give to them, to take from them
+		public Score(double score, int toGive, int toTake) {
+			this.score = score;
+			this.toGive = toGive;
+			this.toTake = toTake;
+		}
+
+		@Override
+		public int compareTo(Score other) {
+			// 1000 avoids small numbers being rounded to 0
+			return (int) (1000 * (this.score - other.score));
+		}
 	}
 	
 	public void updateRelativeWants(Offer[] offers) {

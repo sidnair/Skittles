@@ -211,20 +211,8 @@ public class Inventory {
 	protected class HoardingScoreComparator implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
-			/*
-			 * TODO - incorporate tradability.
-			 */
-			if (x.isTasted() && y.isTasted()) {
-				return (int) (x.getCurrentWorth() - y.getCurrentWorth());
-			} else if (!x.isTasted() && !y.isTasted()) {
-				return x.getCount() - y.getCount();
-			} else if (!x.isTasted() && y.isTasted()) {
-				return y.getValue() > 0 ? -1 : 1;
-			} else {
-				return x.getValue() > 0 ? 1 : -1;
-			}
+			return (int) (x.getHoardingValue() - y.getHoardingValue());
 		}
-		
 	}
 	
 	public ArrayList<Skittle> getSortedSkittleArray() {

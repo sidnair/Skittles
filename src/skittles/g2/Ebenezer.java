@@ -20,6 +20,7 @@ public class Ebenezer extends Player {
 	private KnowledgeBase kb;
 	private Inventory inventory;
 	private Offer ourOffer;
+	private int numPlayers;
 
 	private Offer[] lastOfferSet;
 
@@ -28,6 +29,7 @@ public class Ebenezer extends Player {
 			String className, int[] inHand) {
 		this.playerIndex = playerIndex;
 		this.className = className;
+		this.numPlayers = numPlayers;
 		inventory = new Inventory(inHand);
 		mouth = new Mouth();
 		kb = new KnowledgeBase(inventory, numPlayers, playerIndex);
@@ -100,40 +102,49 @@ public class Ebenezer extends Player {
 
 		int[] toOffer = new int[inventory.getSkittles().length];
 		int[] toReceive = new int[inventory.getSkittles().length];
-
-		// TODO - want multiple colors
-		Skittle wantedColor = sortedSkittles.get(0);
-
-		// starting with third-best color, find the color with the highest
-		// market value.
-		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, sortedSkittles);
-
-		// if we know what color we want AND what color we don't want,
-		// set the offer to SEND unwantedColor and RECEIVE wantedColor
-		// at this point:
-		// unwantedColor is the highest-market-value color that is not one of
-		// our top two
-		// wantedColor is the color with the highest value
-		if (unwantedColor != null && wantedColor != null) {
-			// TODO: why are we calculating count like this?
-			// TODO: make offers of mixed colors
-			int count = (int) Math.min(Math.ceil(unwantedColor.getCount() / 5.0), Math.ceil(wantedColor.getCount() / 5.0));
-			toOffer[unwantedColor.getColor()] = count;
-			toReceive[wantedColor.getColor()] = count;
-			offTemp.setOffer(toOffer, toReceive);
+		
+		
+		ArrayList<Skittle> willingToAdd = new ArrayList<Skittle>();
+		ArrayList<Skittle> willingToGive = new ArrayList<Skittle>();
+		
+		for (Skittle s : sortedSkittles) {
+			if (s.getHoardingValue() >= 0) {
+				willingToAdd.add(s);
+			}
+			// We're willing to give anything; the value calculation of offers
+			// will account for the fact that we don't want to give away our
+			// best colors.
+			
+			// TODO - this prevents adding the top skittle temporarily. This
+			// should be removed.
+			if (sortedSkittles.get(0) != s) {
+				willingToGive.add(s);
+			}
 		}
+		
+		getBestOffer();
 
 		// This is a hack for the meantime because we cannot update if we pick
 		// our own offer.
 		ourOffer = offTemp;
 	}
+	
+	public Offer getBestOffer() {
+		Offer o = null;
+		for (int i = 0; i < numPlayers; i++) {
+			if (i == playerIndex) {
+				continue;
+			}
+			Offer iOffer = getBestOffer(i);
+			if (o == null || getOfferValue(o) < getOfferValue()) {
+				o = iOffer;
+			}
+		}
+		return o;
+	}
 
 	@Override
 	public void happier(double deltaHappiness) {
-		if (deltaHappiness < 0 && mouth.howMany > 1) {
-			System.err.println("FUKKC");
-			System.exit(1);
-		}
 		if (mouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
 			double utility = inventory.getIndividualHappiness(deltaHappiness, mouth.howMany);
 			mouth.skittleInMouth.setValue(utility);
