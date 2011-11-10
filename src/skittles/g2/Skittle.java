@@ -42,11 +42,15 @@ public class Skittle {
 		return this.tasted;
 	}
 	
-	public void setTasted() {
-		this.tasted = true;
+	public void setTasted(boolean tasted) {
+		this.tasted = tasted;
 	}
 	
-	/* If positive, we eat all at once otherwise one by one */
+	/*
+	 * Get the score from eating these Skittles. If the score is negative, we 
+	 * assume that we're eating them one by one. Otherwise, assume that we
+	 * eat them all as quickly as possible.
+	 */
 	public double getCurrentWorth() {
 		if (this.value > 0) {
 			return this.count*this.count*this.value;

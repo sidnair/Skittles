@@ -24,53 +24,66 @@ public class Ebenezer extends Player {
 	private Offer[] lastOfferSet;
 
 	@Override
-	public void initialize(int intPlayerNum, int intPlayerIndex, String strClassName, int[] aintInHand) {
-		this.playerIndex = intPlayerIndex;
-		this.className = strClassName;
-		inventory = new Inventory(aintInHand);
+	public void initialize(int numPlayers, int playerIndex,
+			String className, int[] inHand) {
+		this.playerIndex = playerIndex;
+		this.className = className;
+		inventory = new Inventory(inHand);
 		mouth = new Mouth();
+		kb = new KnowledgeBase(inventory, numPlayers, playerIndex);
 	}
 
 	@Override
-	public void eat(int[] aintTempEat) {
-		//Update everyone else's count
-		if (kb != null) {
-			kb.updateCountByTurn();
-			kb.printEstimateCount();
-		}
-		
-		// First try tasting what you dont know
+	public void eat(int[] toEat) {
+		// Update everyone else's count
+		kb.updateCountByTurn();
+		kb.printEstimateCount();
+
+		// Prioritize skittles that you haven't tasted before.
 		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();
 		if (!untasted.isEmpty()) {
 			Skittle next = untasted.remove();
-			next.setTasted();
-			aintTempEat[next.getColor()] = 1;
+			next.setTasted(true);
+			toEat[next.getColor()] = 1;
 			mouth.put(next, 1);
 			return;
 		}
+		
 		/*
-		 * Then eat one by one the negative values from the highest possible
-		 * (hopefully getting rid of enough negatives - The argument being that
-		 * eating multiple low positives offsets the negatives
+		 * Then, eat negative skittles, starting from the skittle with lowest
+		 * absolute value. Doing this allows us to eat multiple low positives
+		 * in the future in a bigger group, which should more than offest the
+		 * small hit we take from eating these skittles. 
 		 */
 		PriorityQueue<Skittle> highestNegative = inventory.leastNegativeSkittles();
 		if (!highestNegative.isEmpty()) {
 			Skittle next = highestNegative.remove();
-			next.setTasted();
-			aintTempEat[next.getColor()] = 1;
+			next.setTasted(true);
+			toEat[next.getColor()] = 1;
 			mouth.put(next, 1);
 			return;
 		}
-		// Then eat the positives by value in groups
-		// This should be changed to value by consuption, not absolute
-		PriorityQueue<Skittle> skittlesByValuesLowest = inventory.skittlesByValuesLowest();
+		
+		
+		// TODO - sometimes eat the positive Skittles one at a time.
+		// TODO - make sure not to do this when we've reached our biggest pile.
+		
+		/*
+		 * Eat the positive Skittles in groups.
+		 */
+		PriorityQueue<Skittle> skittlesByValuesLowest =
+			inventory.skittlesByValuesLowest();
 		Skittle next = skittlesByValuesLowest.remove();
-		next.setTasted();
-		aintTempEat[next.getColor()] = next.getCount();
+		next.setTasted(true);
+		toEat[next.getColor()] = next.getCount();
 		mouth.put(next, next.getCount());
 	}
 
+	/*
+	 * Wrapper for making an offer.
+	 */
 	public void offer(Offer offTemp) {
+		// Update the relative wants with the set of offers 
 		if (lastOfferSet != null) {
 			kb.updateRelativeWants(lastOfferSet);
 		}
@@ -78,61 +91,22 @@ public class Ebenezer extends Player {
 		makeOffer(offTemp);
 	}
 
-	/**
-	 * Given an 0-for-0 Offer object, mutate it to the offer we want to put on
-	 * the table.
-	 * 
-	 * @param offTemp
-	 *            the offer reference from the simulator
+	/*
+	 * Makes an offer.
 	 */
 	public void makeOffer(Offer offTemp) {
-		if (inventory.tastedSkittlesByCount().isEmpty()) {
-			return;
-		}
 
-		ArrayList<Skittle> tastedSkittles = new ArrayList<Skittle>();
-		for (Skittle s : inventory.getSkittles()) {
-			if (s.isTasted()) {
-				tastedSkittles.add(s);
-			}
-		}
+		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 
-		// sort skittles by how much we like their color
-		Collections.sort(tastedSkittles, new Comparator<Skittle>() {
-			@Override
-			public int compare(Skittle first, Skittle second) {
-				double diff = first.getValue() - second.getValue();
-				if (diff > 0) {
-					return -1;
-				} else if (diff == 0) {
-					return 0;
-				} else {
-					return 1;
-				}
-			}
-		});
-		if (DEBUG) {
-			System.out.println("\ntasted:");
-			for (Skittle s : tastedSkittles)
-				System.out.println(s.toString());
-		}
-
-		// the two sides of our new offer
 		int[] toOffer = new int[inventory.getSkittles().length];
 		int[] toReceive = new int[inventory.getSkittles().length];
 
-		// if we haven't tasted more than 3 colors, make a null offer. (0-for-0)
-		if (tastedSkittles.size() < 3) {
-			offTemp.setOffer(toOffer, toReceive);
-			return;
-		}
-
-		// if we've tasted more than two colors, get our favorite one
-		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
+		// TODO - want multiple colors
+		Skittle wantedColor = sortedSkittles.get(0);
 
 		// starting with third-best color, find the color with the highest
 		// market value.
-		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, tastedSkittles);
+		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, sortedSkittles);
 
 		// if we know what color we want AND what color we don't want,
 		// set the offer to SEND unwantedColor and RECEIVE wantedColor
@@ -155,9 +129,13 @@ public class Ebenezer extends Player {
 	}
 
 	@Override
-	public void happier(double dblHappinessUp) {
+	public void happier(double deltaHappiness) {
+		if (deltaHappiness < 0 && mouth.howMany > 1) {
+			System.err.println("FUKKC");
+			System.exit(1);
+		}
 		if (mouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
-			double utility = inventory.getIndividualHappiness(dblHappinessUp, mouth.howMany);
+			double utility = inventory.getIndividualHappiness(deltaHappiness, mouth.howMany);
 			mouth.skittleInMouth.setValue(utility);
 		}
 		inventory.updateSkittleRankings();
@@ -166,12 +144,6 @@ public class Ebenezer extends Player {
 	@Override
 	public Offer pickOffer(Offer[] currentOffers) {
 
-		// We can't get the number of players another way...
-		if (kb == null) {
-			kb = new KnowledgeBase(inventory, currentOffers.length, playerIndex);
-		}
-		
-		
 		ArrayList<Offer> trades = new ArrayList<Offer>();
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
@@ -271,22 +243,6 @@ public class Ebenezer extends Player {
 		}
 	}
 
-	@Override
-	public String getClassName() {
-		return className;
-	}
-
-	@Override
-	public int getPlayerIndex() {
-		return playerIndex;
-	}
-
-	// For debug mode apparently
-	@Override
-	public void syncInHand(int[] aintInHand) {
-		// TODO Auto-generated method stub
-	}
-
 	public class Mouth {
 		public void put(Skittle s, int h) {
 			this.skittleInMouth = s;
@@ -297,4 +253,23 @@ public class Ebenezer extends Player {
 		public Skittle skittleInMouth;
 		public int howMany;
 	}
+	
+
+	// Unused methods.
+	
+	@Override
+	public String getClassName() {
+		return className;
+	}
+
+	@Override
+	public int getPlayerIndex() {
+		return playerIndex;
+	}
+
+	@Override
+	public void syncInHand(int[] aintInHand) {
+		// TODO Auto-generated method stub
+	}
+
 }
