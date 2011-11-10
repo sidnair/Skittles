@@ -290,6 +290,7 @@ public class KnowledgeBase {
 		return 0.0;
 	}
 	
+	//Is not called yet
 	public void triggerEndStage(int player) {
 		playerStage[player] = STAGE.END;
 	}
