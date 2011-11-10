@@ -2,11 +2,10 @@
 package skittles.g2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 
-import skittles.sim.Game;
 import skittles.sim.Offer;
 
 /**
@@ -93,7 +92,6 @@ public class KnowledgeBase {
 	}
 	
 	public double getCoeffecient(int x) {
-		double temp = 0.0;
         // coefficients
         double a = 1.1023231527810862E+00;
         double b = 4.5624279968285669E-01;
@@ -153,13 +151,19 @@ public class KnowledgeBase {
 				new ArrayList<double[][]>(playerCount); 
 		for (int i = 0; i < playerCount; i++) {
 			int skittleCount = inventory.getNumColors();
-			relativeWants.add(new double[skittleCount][skittleCount]);
+			double[][] arr = new double[skittleCount][skittleCount];
+			for (int j = 0; j < arr.length; j++) {
+				for (int k = 0; k < arr.length; k++) {
+					arr[j][k] = 0.0001;
+				}
+			}
+			relativeWants.add(arr);
 		}
 		return relativeWants;
 	}
 	
-	public Offer getBestOfferPerPlayer(ArrayList<Skittle> want,
-			ArrayList<Skittle> giveUp, int p, int playerIndex) {
+	public Offer getBestOfferPerPlayer(ArrayList<Integer> want,
+			ArrayList<Integer> giveUp, int p, int playerIndex) {
 		int skittleCount = inventory.getNumColors();
 		Offer o = new Offer(playerIndex, skittleCount);
 		int[] toGive = new int[skittleCount];
@@ -173,9 +177,11 @@ public class KnowledgeBase {
 				// i = what they are giving, j = what they are taking;
 				// positive score means they like it
 				double theirVal = relativeWants.get(p)[i][j];
+				double ourVal = inventory.getSkittle(i).getHoardingValue() -
+						inventory.getSkittle(j).getHoardingValue();
 				if (theirVal > 0 && want.contains(i) &&
 						giveUp.contains(j)) {
-					goodTrades.add(new RelativeScore(theirVal, j, i));
+					goodTrades.add(new RelativeScore(theirVal * ourVal, j, i));
 					colorToCount.put(i, Math.min(
 							getEstimatedPlayerCount(i, playerIndex),
 							inventory.getSkittle(i).getCount()));
@@ -186,6 +192,7 @@ public class KnowledgeBase {
 			}
 		}
 		Collections.sort(goodTrades);
+		
 		for (RelativeScore s : goodTrades) {
 			int count = Math.max( 
 				Math.min(colorToCount.get(s.toGive), colorToCount.get(s.toTake)),
@@ -345,26 +352,52 @@ public class KnowledgeBase {
 		return unwantedColor;
 	}
 
-	public double tradeUtility(Offer o) {
-		double valueIn = 0.0;
-		double valueOut = 0.0;
+	public double tradeUtility(Offer o, boolean taking) {
+		double valueOriginal = 0.0;
+		double valueLater = 0.0;
 
 		// what we receive is what they are offering
-		int[] in = o.getOffer();
-		// what we send is what they want
-		int[] out = o.getDesire();
+		int[] in, out;
+		if (taking) {
+			in = o.getOffer();
+			// what we send is what they want
+			out = o.getDesire();
+		} else {
+			in = o.getDesire();
+			out = o.getOffer();
+		}
 
 		double[] colorValues = inventory.getColorValues();
-
+		
 		for (int i = 0; i < in.length; i++) {
-			valueIn += colorValues[i] * Math.pow(in[i], 2);
+			int inCount = inventory.getSkittle(i).getCount();	
+			valueLater += colorValues[i] * Math.pow(inCount + in[i], 2);
+			valueOriginal += colorValues[i] * Math.pow(inCount, 2);
 		}
 
-		for (int j = 0; j < in.length; j++) {
-			valueOut += colorValues[j] * Math.pow(out[j], 2);
+		for (int j = 0; j < out.length; j++) {
+			int outCount = inventory.getSkittle(j).getCount();
+			valueLater += colorValues[j] * (Math.pow(outCount - out[j], 2));
+			valueOriginal += colorValues[j] * (Math.pow(outCount, 2));
 		}
+		
+		double netValue = 0;
+		if (valueOriginal < 0) {
+			netValue += valueOriginal;
+		} else {
+			netValue -= valueOriginal;
+		}
+		netValue += valueLater;
+		
+		System.out.println("***********");
+		System.out.println("taking " + Arrays.toString(in));
+		System.out.println("giving " + Arrays.toString(out));
+		System.out.println(Arrays.toString(colorValues));
+		System.out.println("from " + valueOriginal + " to " + valueLater);
+		System.out.println(netValue);
+		
+		return netValue;
 
-		return valueIn - valueOut;
 	}
 
 	// TODO: calculate the probability that a trade will be accepted
@@ -400,10 +433,10 @@ public class KnowledgeBase {
 		return Math.max((1 - (count / (ourEstimate  + 1))), 0);
 	}
 	
-	public double scoreOffer(Offer o) {
+	public double scoreOurOffer(Offer o) {
 		double score = 0;
 		for (int i = 0; i < playerCount; i++) {
-			double newscore = scoreOffer(o, i);
+			double newscore = scoreOurOffer(o, i);
 			if (newscore > score) {
 				score = newscore;
 			}
@@ -411,8 +444,8 @@ public class KnowledgeBase {
 		return score;
 	}
 	
-	public double scoreOffer(Offer o, int player) {
-		return this.tradeUtility(o) * getOtherHappiness(o, player) *
+	public double scoreOurOffer(Offer o, int player) {
+		return this.tradeUtility(o, false) * getOtherHappiness(o, player) *
 				tradeCountProbabilityPerPlayer(o, player);
 	}
 	

@@ -73,7 +73,7 @@ public class Ebenezer extends Player {
 		if(skittlesByValuesLowest.size() > 1) {
 			Offer bestTrade = getOurBestTrade();
 			
-			if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
+			if (kb.tradeUtility(bestTrade, true) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
 				next.setTasted(true);
 				toEat[next.getColor()] = 1;
 				mouth.put(next, 1);
@@ -99,19 +99,10 @@ public class Ebenezer extends Player {
 			kb.updateRelativeWants(lastOfferSet);
 		}
 		lastOfferSet = null;
-		makeOffer(offTemp);
-	}
-
-	/*
-	 * Makes an offer.
-	 */
-	public void makeOffer(Offer offTemp) {
-
-		offTemp = getOurBestTrade();
-
-		// This is a hack for the meantime because we cannot update if we pick
-		// our own offer.
+		Offer bestOffer = getOurBestTrade();
+		offTemp.setOffer(bestOffer.getOffer(), bestOffer.getDesire());
 		ourOffer = offTemp;
+		System.exit(1);
 	}
 
 	/**
@@ -122,39 +113,43 @@ public class Ebenezer extends Player {
 		
 		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 		
-		ArrayList<Skittle> willingToAdd = new ArrayList<Skittle>();
-		ArrayList<Skittle> willingToGive = new ArrayList<Skittle>();
+		ArrayList<Integer> willingToAdd = new ArrayList<Integer>();
+		ArrayList<Integer> willingToGive = new ArrayList<Integer>();
 		
 		for (Skittle s : sortedSkittles) {
-			if (s.getHoardingValue() >= 0) {
-				willingToAdd.add(s);
+			if (s.getHoardingValue() >= 0 || !s.isTasted()) {
+				willingToAdd.add(s.getColor());
 			}
 			// We're willing to give anything; the value calculation of offers
 			// will account for the fact that we don't want to give away our
 			// best colors.
 			
-			// TODO - this prevents adding the top skittle temporarily. This
-			// should be removed.
+			// TODO - this prevents adding the top skittle manually temporarily.
+			// This should be removed.
 			if (sortedSkittles.get(0) != s) {
-				willingToGive.add(s);
+				willingToGive.add(s.getColor());
 			}
 		}
 		
 		Offer best = getBestOffer(willingToAdd, willingToGive);
 		if (best != null) {
 			offTemp.setOffer(best.getOffer(), best.getDesire());
-		} else {
-			System.exit(1);
 		}
-
-		// This is a hack for the meantime because we cannot update if we pick
-		// our own offer.
-		ourOffer = offTemp;
+		
 		return offTemp;
 	}
 	
-	public Offer getBestOffer(ArrayList<Skittle> willingToAdd,
-			ArrayList<Skittle> willingToGive) {
+	private boolean isEmpty(int[] offer) {
+		for (int i = 0; i < offer.length; i++) {
+			if (offer[i] > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Offer getBestOffer(ArrayList<Integer> willingToAdd,
+			ArrayList<Integer> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
 			if (i == playerIndex || !kb.isActive(i)) {
@@ -162,7 +157,8 @@ public class Ebenezer extends Player {
 			}
 			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
 					i, playerIndex);
-			if (o == null || kb.scoreOffer(o) < kb.scoreOffer(iOffer)) {
+			
+			if (o == null || kb.scoreOurOffer(o) < kb.scoreOurOffer(iOffer)) {
 				o = iOffer;
 			}
 		}
@@ -181,22 +177,23 @@ public class Ebenezer extends Player {
 	@Override
 	public Offer pickOffer(Offer[] currentOffers) {
 
-		ArrayList<Offer> trades = new ArrayList<Offer>();
+		ArrayList<Offer> potentialTrades = new ArrayList<Offer>();
 		for (Offer o : currentOffers) {
 			if (o.getOfferLive() && canTake(o)) {
-				trades.add(o);
+				potentialTrades.add(o);
 			}
 		}
 
-		if (trades.size() == 0) {
+		if (potentialTrades.size() == 0) {
 			return null;
 		}
 
 		// sort trades by their utility (computed by tradeUtility())
-		Collections.sort(trades, new Comparator<Offer>() {
+		Collections.sort(potentialTrades, new Comparator<Offer>() {
 			@Override
 			public int compare(Offer first, Offer second) {
-				double diff = kb.tradeUtility(first) - kb.tradeUtility(second);
+				// TODO - 
+				double diff = kb.tradeUtility(first, true) - kb.tradeUtility(second, true);
 				if (diff > 0) {
 					return -1;
 				} else if (diff == 0) {
@@ -207,11 +204,11 @@ public class Ebenezer extends Player {
 			}
 		});
 
-		Offer bestTrade = trades.get(0);
-		double bestTradeUtility = kb.tradeUtility(bestTrade);
+		Offer bestTrade = potentialTrades.get(0);
+		double bestTradeUtility = kb.tradeUtility(bestTrade, true);
 		if (DEBUG) {
-			for (Offer t : trades) {
-				System.out.println(t.toString() + " = " + kb.tradeUtility(t));
+			for (Offer t : potentialTrades) {
+				System.out.println(t.toString() + " = " + kb.tradeUtility(t, true));
 			}
 			System.out.println("bestTrade: " + bestTrade.toString() + " = " + bestTradeUtility);
 		}
