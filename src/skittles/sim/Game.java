@@ -154,7 +154,7 @@ public class Game
 		aplsPlayerStatus = alPlayerStatus.toArray( new PlayerStatus[ 0 ] );	
 	}
 	
-	public void runGame()
+	public ArrayList<Double> runGame()
 	{
 		FileWriter[] afrtPortfolio = new FileWriter[ intPlayerNum ];
 		BufferedWriter[] abfwPortfolio = new BufferedWriter[ intPlayerNum ];
@@ -193,10 +193,12 @@ public class Game
 		{
 			dblTotal += plsTemp.getHappiness();
 		}
+		ArrayList<Double> scores = new ArrayList<Double>();
 		for ( PlayerStatus plsTemp : aplsPlayerStatus )
 		{
 			double dblTempHappy = ( plsTemp.getHappiness() + ( dblTotal - plsTemp.getHappiness() ) / ( intPlayerNum - 1 ) ) / 2;
 			System.out.println( "Player #" + plsTemp.getPlayerIndex() + "'s happiness is: " + dblTempHappy );
+			scores.add(dblTempHappy);
 		}
 		
 		try {
@@ -209,7 +211,7 @@ public class Game
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return scores;
 	}
 	
 	private void logGame( BufferedWriter[] abfwPortfolio, String strLogWhat )
