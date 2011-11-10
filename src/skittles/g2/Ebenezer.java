@@ -121,10 +121,6 @@ public class Ebenezer extends Player {
 		Offer offTemp = new Offer(getPlayerIndex(), inventory.getNumColors());
 		
 		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
-
-		int[] toOffer = new int[inventory.getSkittles().length];
-		int[] toReceive = new int[inventory.getSkittles().length];
-		
 		
 		ArrayList<Skittle> willingToAdd = new ArrayList<Skittle>();
 		ArrayList<Skittle> willingToGive = new ArrayList<Skittle>();
@@ -157,7 +153,7 @@ public class Ebenezer extends Player {
 			ArrayList<Skittle> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
-			if (i == playerIndex) {
+			if (i == playerIndex || kb.isInactive(i)) {
 				continue;
 			}
 			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
