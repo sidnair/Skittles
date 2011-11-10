@@ -441,11 +441,8 @@ public class KnowledgeBase {
 			}
 		}	
 		for (int j = 0; j < playerCount; j++) {
-			if (playerStage[j] == STAGE.HOARD) {
+			if (playerStage[j] != STAGE.DISCOVERY) {
 				hoardEstimate(j);
-			}
-			else if (playerStage[j] == STAGE.END) {
-				endEstimate(j);
 			}
 		}
 	}
@@ -464,18 +461,6 @@ public class KnowledgeBase {
 				estimatedCount[j][i] = 0;
 			}
 		}
-	}
-
-	private void endEstimate(int j) {
-		int currMaxIndex = 0;
-		double currMaxCount = 0;
-		for (int i = 0; i < inventory.size(); i++) {
-			if (estimatedCount[j][i] > currMaxCount) {
-				currMaxIndex = i;
-				currMaxCount = estimatedCount[j][i];
-			}
-		}
-		estimatedCount[j][currMaxIndex] -= currMaxCount;
 	}
 
 	public void updateCountByOffer(Offer o) {
