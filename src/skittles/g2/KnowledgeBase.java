@@ -28,6 +28,8 @@ public class KnowledgeBase {
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
+	
+	private int skittleCount;
 
 
 	private double[][] estimatedCount;
@@ -283,11 +285,9 @@ public class KnowledgeBase {
 		return 0.0;
 	}
 
-	// TODO
 	public double countProbability(int count, int color, int player) {
-		// p players, c colors, n skittles per player
-
-		return 0.0;
+		double ourEstimate = estimatedCount[player][color];
+		return Math.max((1 - (count / (ourEstimate  + 1))), 0);
 	}
 	
 	//Is not called yet
