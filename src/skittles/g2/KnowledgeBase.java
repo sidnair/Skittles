@@ -77,15 +77,24 @@ public class KnowledgeBase {
 		marketHistory = new PreferenceHistory(inventory.getNumColors());
 
 		// For counting the players
-		int avgCount = inventory.getStartingSkittles() / inventory.size();
+		double avgCount = inventory.getStartingSkittles() / (inventory.size() * 1.0);
 		estimatedCount = new double[playerCount][inventory.size()];
 		for (int j = 0; j < playerCount; j++) {
 			this.estimatedCount[j] = new double[inventory.size()];
 			for (int i = 0; i < inventory.size(); i++) {
-				estimatedCount[j][i] = avgCount;
+				estimatedCount[j][i] = Math.max(avgCount * (getCoeffecient(inventory.size())), 0); //Empirically proven to give conservative estimate
 			}
 		}
 		this.turn = 0;
+	}
+	
+	public double getCoeffecient(int x) {
+		double temp = 0.0;
+        // coefficients
+        double a = 1.1023231527810862E+00;
+        double b = 4.5624279968285669E-01;
+        double c = -2.2103379207855689E-01;
+        return a * Math.pow((x - b), c);
 	}
 
 	public void storeUnselectedTrade(Offer offer) {
@@ -409,10 +418,11 @@ public class KnowledgeBase {
 	}
 
 	public void updateCountByTurn() {
-		if (turn == 0) {
+		turn++;
+		if (turn == 1) {
 			for (int j = 0; j < playerCount; j++) {
 				for (int i = 0; i < inventory.size(); i++) {
-					if (estimatedCount[j][i] > 0) {
+					if (estimatedCount[j][i] > 1) {
 						estimatedCount[j][i] -= 1;
 					}
 				}
@@ -434,7 +444,6 @@ public class KnowledgeBase {
 				endEstimate(j);
 			}
 		}
-		turn++;
 	}
 
 	private void hoardEstimate(int j) {
@@ -445,8 +454,10 @@ public class KnowledgeBase {
 			}
 		}
 		for (int i = 0; i < inventory.size(); i++) {
-			if (estimatedCount[j][i] > 0) {
+			if ((estimatedCount[j][i] - (1.0 / (inventory.size() - zeroCount)) > 1)) {
 				estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
+			} else {
+				estimatedCount[j][i] = 0;
 			}
 		}
 	}
@@ -468,9 +479,17 @@ public class KnowledgeBase {
 		int selector = o.getPickedByIndex();
 		for (int i = 0; i < inventory.size(); i++) {
 			estimatedCount[selector][i] += o.getOffer()[i];
-			estimatedCount[proposer][i] -= o.getOffer()[i];
+			if (estimatedCount[proposer][i] - o.getOffer()[i] > 0) {
+				estimatedCount[proposer][i] -= o.getOffer()[i];
+			} else {
+				estimatedCount[proposer][i] = 0;
+			}
 			
-			estimatedCount[selector][i] -= o.getDesire()[i];
+			if (estimatedCount[selector][i] - o.getDesire()[i] > 0) {
+				estimatedCount[selector][i] -= o.getDesire()[i];
+			} else {
+				estimatedCount[selector][i] = 0;
+			}
 			estimatedCount[proposer][i] += o.getDesire()[i];
 
 		}

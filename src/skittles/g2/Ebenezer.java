@@ -25,8 +25,7 @@ public class Ebenezer extends Player {
 	private Offer[] lastOfferSet;
 
 	@Override
-	public void initialize(int numPlayers, double tasteDistMean, int playerIndex,
-			String className, int[] inHand) {
+	public void initialize(int numPlayers, double tasteDistMean, int playerIndex, String className, int[] inHand) {
 		this.playerIndex = playerIndex;
 		this.className = className;
 		this.numPlayers = numPlayers;
@@ -64,24 +63,17 @@ public class Ebenezer extends Player {
 			toEat[next.getColor()] = 1;
 			mouth.put(next, 1);
 			return;
-		} else {
-			
 		}
 
 		PriorityQueue<Skittle> skittlesByValuesLowest =
 			inventory.skittlesByValuesLowest();
-		Skittle next = null;
-		// if there are no negatives and we've tasted all skittles and there are more than one pile left,
-		// eat positives one at a time
+		Skittle next = skittlesByValuesLowest.peek();
+		// if there are no negatives and we've tasted all skittles and there are more than one pile left
+		// and we can make a good trade, eat positives one at a time
 		if(skittlesByValuesLowest.size() > 1) {
-			next = skittlesByValuesLowest.peek();
-		
 			Offer bestTrade = getOurBestTrade();
 			
 			if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
-				if(next.getCount() == 1) {
-					skittlesByValuesLowest.remove();
-				}
 				next.setTasted(true);
 				toEat[next.getColor()] = 1;
 				mouth.put(next, 1);
@@ -91,8 +83,8 @@ public class Ebenezer extends Player {
 		
 		/*
 		 * Eat the positive Skittles in groups if we can't make good trades
+		 * ...even if we have more than one pile of positive skittles
 		 */
-		next = skittlesByValuesLowest.remove();
 		next.setTasted(true);
 		toEat[next.getColor()] = next.getCount();
 		mouth.put(next, next.getCount());
