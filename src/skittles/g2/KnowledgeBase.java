@@ -2,7 +2,6 @@
 package skittles.g2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -235,22 +234,25 @@ public class KnowledgeBase {
 		}
 	}
 	
-	public void updateRelativeWants(Offer[] offers) {
+	public void updateRelativeWants(ArrayList<SuperOffer> offers) {
 		ArrayList<double[][]> tempRelativeWants = getRelativeWants();
-		for (Offer o : offers) {
+		for (SuperOffer so : offers) {
+			Offer o = so.getOffer();
 			// Skip ignored trades for now.
-			if (o.getPickedByIndex() == -1) {
-				continue;
-			}
 			int proposer = o.getOfferedByIndex();
 			int selector = o.getPickedByIndex();
 			addRelativeWants(tempRelativeWants, proposer, o.getDesire(),
-					o.getOffer());
-			addRelativeWants(tempRelativeWants, selector, o.getOffer(),
-					o.getDesire());
+					o.getOffer(), false);
+			if (selector == -1) {
+				handleSkippedSuperOffer(so, tempRelativeWants);
+			} else {
+				addRelativeWants(tempRelativeWants, selector, o.getOffer(),
+						o.getDesire(), false);
+			}
 		}
 		mergeWants(tempRelativeWants);
 		
+		/*
 		for (Offer o : offers) {
 			if (o.getPickedByIndex() != -1) {
 				for (int i : o.getDesire()) {
@@ -262,8 +264,18 @@ public class KnowledgeBase {
 				}
 			}
 		}
+		*/
 	}
 	
+	private void handleSkippedSuperOffer(SuperOffer so,
+			ArrayList<double[][]> tempRelativeWants) {
+		for (int p : so.getSkippers()) {
+			Offer o = so.getOffer();
+			addRelativeWants(tempRelativeWants, p, o.getOffer(), o.getDesire(),
+					true);
+		}
+	}
+
 	private void mergeWants(ArrayList<double[][]> tempRelativeWants) {
 		for (int i = 0; i < tempRelativeWants.size(); i++) {
 			double[][] tempArray = tempRelativeWants.get(i);
@@ -292,7 +304,7 @@ public class KnowledgeBase {
 		return givenRatios;
 	}
 	private void addRelativeWants(ArrayList<double[][]> tempRelativeWants,
-			int affectedPlayerIndex, int[] gained, int[] given) {
+			int affectedPlayerIndex, int[] gained, int[] given, boolean dislike) {
 		double[][] playerWants = tempRelativeWants.get(affectedPlayerIndex);
 		
 		double[] givenRatios = getRatios(given);
@@ -305,8 +317,14 @@ public class KnowledgeBase {
 		for (int i = 0; i < givenRatios.length; i++) {
 			for (int j = 0; j < gainedRatios.length; j++) {
 				if (gainedRatios[i] != 0 && givenRatios[j] != 0) {
-					playerWants[j][i] += gainedRatios[i] / givenRatios[j];
-					playerWants[i][j] -= gainedRatios[i] / givenRatios[j];
+					double jiChange = gainedRatios[i] / givenRatios[j];
+					double ijChange = gainedRatios[i] / givenRatios[j];
+					if (dislike) {
+						jiChange *= 0.25;
+						ijChange *= 0.25;
+					}
+					playerWants[j][i] += jiChange;
+					playerWants[i][j] -= ijChange;
 				}
 			}
 		}

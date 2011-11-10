@@ -96,7 +96,7 @@ public class Ebenezer extends Player {
 	public void offer(Offer offTemp) {
 		// Update the relative wants with the set of offers 
 		if (lastOfferSet != null) {
-			kb.updateRelativeWants(lastOfferSet);
+			kb.updateRelativeWants(SuperOffer.makeArr(lastOfferSet, numPlayers));
 		}
 		lastOfferSet = null;
 		Offer bestOffer = getOurBestTrade();
