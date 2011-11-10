@@ -4,7 +4,7 @@ public class Skittles
 {
 	public static void main( String[] args )
 	{		
-		Game gamNew = new Game( "GameConfig.xml" );
+		Game gamNew = new Game( "configs/GameConfig.xml" );
 		gamNew.runGame();
 	}
 }

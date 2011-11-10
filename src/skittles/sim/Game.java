@@ -29,6 +29,11 @@ public class Game
 	
 	public static Scanner scnInput = new Scanner( System.in );
 	
+	private int getSeed() {
+		return (new Random(System.currentTimeMillis())).nextInt();
+		//return 123456789;
+	}
+	
 	public Game( String strXMLPath )
 	{
 		DocumentBuilderFactory dbfGameConfig = DocumentBuilderFactory.newInstance();
@@ -329,7 +334,7 @@ public class Game
 	private double[] randomTastes(double dblMean) 
 	{
 		double[] adblRandomTastes = new double[ intColorNum ];
-		Random rdmTemp = new Random();
+		Random rdmTemp = new Random(getSeed());
 		for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 		{
 			double dblTemp = -5;		// out of range [ -1, 1 ]
@@ -360,7 +365,7 @@ public class Game
 ////			System.out.print( aintRandomInHand[ intColorIndex ] + " " );
 //		}
 //		System.out.println();
-		Random rdmTemp = new Random();
+		Random rdmTemp = new Random(getSeed());
 		for ( int intSkittleIndex = 0; intSkittleIndex < intTotalNum; intSkittleIndex ++ )
 		{
 			int intTemp = rdmTemp.nextInt( intColorNum );
@@ -486,7 +491,7 @@ public class Game
 			alPlayerIndices.add( intPlayerIndex );
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
-		Random rdmGenerator = new Random();
+		Random rdmGenerator = new Random(getSeed());
 		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{

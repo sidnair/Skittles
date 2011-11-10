@@ -12,7 +12,7 @@ import skittles.sim.Player;
 
 public class Ebenezer extends Player {
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	private String className;
 	private int playerIndex;
