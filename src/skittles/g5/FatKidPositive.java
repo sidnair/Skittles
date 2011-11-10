@@ -128,7 +128,7 @@ public class FatKidPositive extends Player
 		intLastEatNum = skittlesToEat;
 		skittlesEaten+=skittlesToEat;
 		if(debugging) {
-			System.out.println("\n Eating by intPlayerIndex="+intPlayerIndex+" in round="+round+" intLastEatIndex="+intLastEatIndex+"  intLastEatNum="+intLastEatNum);
+//			System.out.println("\n Eating by intPlayerIndex="+intPlayerIndex+" in round="+round+" intLastEatIndex="+intLastEatIndex+"  intLastEatNum="+intLastEatNum);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class FatKidPositive extends Player
 		transactionSize=0;
 		double maxValue=0;
 		if(debugging) {
-			System.out.println("\n In round "+round);
+//			System.out.println("\n In round "+round);
 			for ( int i=0; i<intPlayerNum; i++ ) {
 				printArray("Player "+i,netTradesPerPlayer.get(i));
 			}
@@ -185,7 +185,7 @@ public class FatKidPositive extends Player
 		int colorsIgnored=0;
 		while(loopOn && colorsIgnored<intColorNum) {
 			maxValue=findBestOfferToMake(ignoreColors);
-			System.out.println("maxValueTasteIndex="+maxValueTasteIndex+"minValueTasteIndex="+minValueTasteIndex+"transactionSize="+transactionSize+"maxValue="+maxValue);
+//			System.out.println("maxValueTasteIndex="+maxValueTasteIndex+"minValueTasteIndex="+minValueTasteIndex+"transactionSize="+transactionSize+"maxValue="+maxValue);
 			loopOn=false;
 			if(lastOfferMinIndex==minValueTasteIndex && lastOfferMaxIndex==maxValueTasteIndex ) {
 				if( lastRoundOurOfferAccepted!=(round-1)) {
@@ -236,8 +236,8 @@ public class FatKidPositive extends Player
 
 		offTemp.setOffer( aintOffer, aintDesire );
 		if(debugging) {
-			System.out.println("\nstrClassName="+this.strClassName+"  intPlayerIndex="+intPlayerIndex+" Offer="+minValueTasteIndex+
-					"  Desire="+maxValueTasteIndex);
+//			System.out.println("\nstrClassName="+this.strClassName+"  intPlayerIndex="+intPlayerIndex+" Offer="+minValueTasteIndex+
+//					"  Desire="+maxValueTasteIndex);
 			printArray("aintInHand",aintInHand);
 			printArray("adblTastes",adblTastes);
 		}
@@ -255,7 +255,7 @@ public class FatKidPositive extends Player
 		{
 			if ( adblTastes[ intLastEatIndex ] != dblHappinessPerCandy )
 			{
-				System.out.println( "Error: Inconsistent color happiness!" );
+//				System.out.println( "Error: Inconsistent color happiness!" );
 			}
 		}
 	}

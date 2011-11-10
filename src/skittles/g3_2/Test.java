@@ -54,7 +54,7 @@ public class Test {
 		bigInfo.update(-100);
 		assert smallInfo.pile.hoarding.size() == 1 && smallInfo.pile.trading.size() == 1;
 		assert bigInfo.pile.trading.size() == 2 && bigInfo.pile.hoarding.size() == 0;
-		Util.print(smallInfo.preference);
+//		Util.print(smallInfo.preference);
 		assert Math.round(smallInfo.preference[1]) == 1;
 		assert Math.round(bigInfo.preference[1]) == -1;
 		
