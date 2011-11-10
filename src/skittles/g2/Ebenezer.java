@@ -141,7 +141,9 @@ public class Ebenezer extends Player {
 		}
 		
 		Offer best = getBestOffer(willingToAdd, willingToGive);
-		offTemp.setOffer(best.getOffer(), best.getDesire());
+		if (best != null) {
+			offTemp.setOffer(best.getOffer(), best.getDesire());
+		}
 
 		// This is a hack for the meantime because we cannot update if we pick
 		// our own offer.
@@ -153,7 +155,7 @@ public class Ebenezer extends Player {
 			ArrayList<Skittle> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
-			if (i == playerIndex || kb.isActive(i)) {
+			if (i == playerIndex || !kb.isActive(i)) {
 				continue;
 			}
 			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
