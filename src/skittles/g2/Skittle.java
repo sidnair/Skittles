@@ -76,7 +76,7 @@ public class Skittle {
 		// Have some small positive value for getting an untasted color; this
 		// means that having more of an untasted color is better than having
 		// less of another untasted color and than having a color of value 0.
-		return this.isTasted() ? this.getCurrentWorth() : 0.001;
+		return this.isTasted() ? this.getCurrentWorth() : 0.001 * this.count * this.count;
 	}
 
 }

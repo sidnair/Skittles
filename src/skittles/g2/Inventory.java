@@ -198,6 +198,9 @@ public class Inventory {
 		}
 	}
 	
+	/*
+	 * Low score first.
+	 */
 	protected class HoardingScoreComparator implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
@@ -205,10 +208,14 @@ public class Inventory {
 		}
 	}
 	
+	/*
+	 * High hoarding score first.
+	 */
 	public ArrayList<Skittle> getSortedSkittleArray() {
 		ArrayList<Skittle> sortedSkittles = new ArrayList<Skittle>();
 		Collections.addAll(sortedSkittles, this.getSkittles());
 		Collections.sort(sortedSkittles, new HoardingScoreComparator());
+		Collections.reverse(sortedSkittles);
 		return sortedSkittles;
 	}
 }

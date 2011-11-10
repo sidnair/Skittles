@@ -13,26 +13,12 @@ import skittles.sim.Offer;
  * interested in getting.
  */
 public class KnowledgeBase {
-
-	// TODO - detect messages
 	// TODO - see what trades people skipped
-	// TODO - account for fact that people might not know color?
-
-	// TODO - store stores trades in 'rounds'
-
-	// TODO - keep track of trades that are 'bad' (being ignored) in a way that
-	// allows us to make better trades
-	// TODO - better decay for market preference?
-
-	// NOTE - even distributions of skittles are per player
 
 	private Inventory inventory;
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
-	
-	private int skittleCount;
-
 
 	private double[][] estimatedCount;
 	private int turn;
@@ -103,9 +89,11 @@ public class KnowledgeBase {
 		unsuccessfulOffers.add(offer);
 		
 		int proposer = offer.getOfferedByIndex();
-		playerHistories.get(proposer).addUnsuccessfulTrade(offer.getOffer(), offer.getDesire());
+		playerHistories.get(proposer).addUnsuccessfulTrade(
+				offer.getOffer(), offer.getDesire());
 		if (proposer != selfIndex) {
-			marketHistory.addUnsuccessfulTrade(offer.getOffer(), offer.getDesire());
+			marketHistory.addUnsuccessfulTrade(offer.getOffer(),
+					offer.getDesire());
 		}
 	}
 	
@@ -181,6 +169,15 @@ public class KnowledgeBase {
 						inventory.getSkittle(j).getHoardingValue();
 				if (theirVal > 0 && want.contains(i) &&
 						giveUp.contains(j)) {
+					
+					/*
+					System.out.println(inventory.getSkittle(i).getHoardingValue());
+					System.out.println(inventory.getSkittle(j).getHoardingValue());
+					System.out.println(ourVal);
+					System.out.println("we get " + i + " for " + j);
+					System.out.println("");
+					*/
+					
 					goodTrades.add(new RelativeScore(theirVal * ourVal, j, i));
 					colorToCount.put(i, Math.min(
 							getEstimatedPlayerCount(i, playerIndex),
@@ -191,7 +188,11 @@ public class KnowledgeBase {
 				}
 			}
 		}
+		
 		Collections.sort(goodTrades);
+		Collections.reverse(goodTrades);
+		
+//		System.out.println(goodTrades);
 		
 		for (RelativeScore s : goodTrades) {
 			int count = Math.max( 
@@ -202,6 +203,11 @@ public class KnowledgeBase {
 			toGive[s.toGive] += count;
 			toRequest[s.toTake] += count;
 		}
+		
+//		System.out.print("giving " + Arrays.toString(toGive));
+//		System.out.print(" and taking " + Arrays.toString(toRequest));
+//		System.out.println(" to player " + p);
+		
 		o.setOffer(toGive, toRequest);
 		return o;
 	}
@@ -222,6 +228,10 @@ public class KnowledgeBase {
 		public int compareTo(RelativeScore other) {
 			// 1000 avoids small numbers being rounded to 0
 			return (int) (1000 * (this.score - other.score));
+		}
+		
+		public String toString() {
+			return toGive + " for " + toTake + " ; " + score;
 		}
 	}
 	
@@ -371,13 +381,15 @@ public class KnowledgeBase {
 		
 		for (int i = 0; i < in.length; i++) {
 			int inCount = inventory.getSkittle(i).getCount();	
-			valueLater += colorValues[i] * Math.pow(inCount + in[i], 2);
+			double value = colorValues[i] == -2 ? 0.001 : colorValues[i];
+			valueLater += value * Math.pow(inCount + in[i], 2);
 			valueOriginal += colorValues[i] * Math.pow(inCount, 2);
 		}
 
 		for (int j = 0; j < out.length; j++) {
 			int outCount = inventory.getSkittle(j).getCount();
-			valueLater += colorValues[j] * (Math.pow(outCount - out[j], 2));
+			double value = colorValues[j] == -2 ? 0.001 : colorValues[j];
+			valueLater += value * (Math.pow(outCount - out[j], 2));
 			valueOriginal += colorValues[j] * (Math.pow(outCount, 2));
 		}
 		
@@ -389,12 +401,14 @@ public class KnowledgeBase {
 		}
 		netValue += valueLater;
 		
+		/*
 		System.out.println("***********");
 		System.out.println("taking " + Arrays.toString(in));
 		System.out.println("giving " + Arrays.toString(out));
 		System.out.println(Arrays.toString(colorValues));
 		System.out.println("from " + valueOriginal + " to " + valueLater);
 		System.out.println(netValue);
+		*/
 		
 		return netValue;
 
