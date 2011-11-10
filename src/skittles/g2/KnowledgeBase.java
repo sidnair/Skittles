@@ -308,25 +308,25 @@ public class KnowledgeBase {
 				}
 			}
 		}	
-			for (int j = 0; j < playerCount; j++) {
-				if (playerStage[j] == STAGE.HOARD) {
-					int zeroCount = 0;
-					for (int i = 0; i < inventory.size(); i++) {
-						if (estimatedCount[j][i] <= 0) {
-							zeroCount++;
-						}
-					}
-					for (int i = 0; i < inventory.size(); i++) {
-						if (estimatedCount[j][i] > 0) {
-							estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
-						}
+		for (int j = 0; j < playerCount; j++) {
+			if (playerStage[j] == STAGE.HOARD) {
+				int zeroCount = 0;
+				for (int i = 0; i < inventory.size(); i++) {
+					if (estimatedCount[j][i] <= 0) {
+						zeroCount++;
 					}
 				}
-				if (playerStage[j] == STAGE.END) {
-					;
-					//The heuristic of not trading means eating doesn't work.. rethinking
+				for (int i = 0; i < inventory.size(); i++) {
+					if (estimatedCount[j][i] > 0) {
+						estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
+					}
 				}
 			}
+			if (playerStage[j] == STAGE.END) {
+				;
+				//The heuristic of not trading means eating doesn't work.. rethinking
+			}
+		}
 		turn++;
 	}
 
