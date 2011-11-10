@@ -160,6 +160,7 @@ public class Ebenezer extends Player {
 			double utility = inventory.getIndividualHappiness(dblHappinessUp, mouth.howMany);
 			mouth.skittleInMouth.setValue(utility);
 		}
+		inventory.updateSkittleRankings();
 	}
 
 	@Override
