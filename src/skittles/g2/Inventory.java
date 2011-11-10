@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import skittles.g5.sim.Game;
+import skittles.sim.Game;
 
 public class Inventory {
 	
