@@ -157,9 +157,13 @@ public class Ebenezer extends Player {
 	}
 
 	@Override
-	public void happier(double dblHappinessUp) {
+	public void happier(double deltaHappiness) {
+		if (deltaHappiness < 0 && mouth.howMany > 1) {
+			System.err.println("FUKKC");
+			System.exit(1);
+		}
 		if (mouth.skittleInMouth.getValue() == Skittle.UNDEFINED_VALUE) {
-			double utility = inventory.getIndividualHappiness(dblHappinessUp, mouth.howMany);
+			double utility = inventory.getIndividualHappiness(deltaHappiness, mouth.howMany);
 			mouth.skittleInMouth.setValue(utility);
 		}
 		inventory.updateSkittleRankings();
