@@ -99,18 +99,7 @@ public class Ebenezer extends Player {
 			kb.updateRelativeWants(lastOfferSet);
 		}
 		lastOfferSet = null;
-		makeOffer(offTemp);
-	}
-
-	/*
-	 * Makes an offer.
-	 */
-	public void makeOffer(Offer offTemp) {
-
 		offTemp = getOurBestTrade();
-
-		// This is a hack for the meantime because we cannot update if we pick
-		// our own offer.
 		ourOffer = offTemp;
 	}
 
@@ -122,21 +111,21 @@ public class Ebenezer extends Player {
 		
 		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 		
-		ArrayList<Skittle> willingToAdd = new ArrayList<Skittle>();
-		ArrayList<Skittle> willingToGive = new ArrayList<Skittle>();
+		ArrayList<Integer> willingToAdd = new ArrayList<Integer>();
+		ArrayList<Integer> willingToGive = new ArrayList<Integer>();
 		
 		for (Skittle s : sortedSkittles) {
-			if (s.getHoardingValue() >= 0) {
-				willingToAdd.add(s);
+			if (s.getHoardingValue() >= 0 || !s.isTasted()) {
+				willingToAdd.add(s.getColor());
 			}
 			// We're willing to give anything; the value calculation of offers
 			// will account for the fact that we don't want to give away our
 			// best colors.
 			
-			// TODO - this prevents adding the top skittle temporarily. This
-			// should be removed.
+			// TODO - this prevents adding the top skittle manually temporarily.
+			// This should be removed.
 			if (sortedSkittles.get(0) != s) {
-				willingToGive.add(s);
+				willingToGive.add(s.getColor());
 			}
 		}
 		
@@ -151,8 +140,17 @@ public class Ebenezer extends Player {
 		return offTemp;
 	}
 	
-	public Offer getBestOffer(ArrayList<Skittle> willingToAdd,
-			ArrayList<Skittle> willingToGive) {
+	private boolean isEmpty(int[] offer) {
+		for (int i = 0; i < offer.length; i++) {
+			if (offer[i] > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public Offer getBestOffer(ArrayList<Integer> willingToAdd,
+			ArrayList<Integer> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
 			if (i == playerIndex || !kb.isActive(i)) {
@@ -160,6 +158,7 @@ public class Ebenezer extends Player {
 			}
 			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
 					i, playerIndex);
+			
 			if (o == null || kb.scoreOffer(o) < kb.scoreOffer(iOffer)) {
 				o = iOffer;
 			}

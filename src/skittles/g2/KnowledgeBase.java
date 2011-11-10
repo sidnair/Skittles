@@ -93,7 +93,6 @@ public class KnowledgeBase {
 	}
 	
 	public double getCoeffecient(int x) {
-		double temp = 0.0;
         // coefficients
         double a = 1.1023231527810862E+00;
         double b = 4.5624279968285669E-01;
@@ -153,13 +152,19 @@ public class KnowledgeBase {
 				new ArrayList<double[][]>(playerCount); 
 		for (int i = 0; i < playerCount; i++) {
 			int skittleCount = inventory.getNumColors();
-			relativeWants.add(new double[skittleCount][skittleCount]);
+			double[][] arr = new double[skittleCount][skittleCount];
+			for (int j = 0; j < arr.length; j++) {
+				for (int k = 0; k < arr.length; k++) {
+					arr[j][k] = 0.0001;
+				}
+			}
+			relativeWants.add(arr);
 		}
 		return relativeWants;
 	}
 	
-	public Offer getBestOfferPerPlayer(ArrayList<Skittle> want,
-			ArrayList<Skittle> giveUp, int p, int playerIndex) {
+	public Offer getBestOfferPerPlayer(ArrayList<Integer> want,
+			ArrayList<Integer> giveUp, int p, int playerIndex) {
 		int skittleCount = inventory.getNumColors();
 		Offer o = new Offer(playerIndex, skittleCount);
 		int[] toGive = new int[skittleCount];
@@ -186,6 +191,7 @@ public class KnowledgeBase {
 			}
 		}
 		Collections.sort(goodTrades);
+		
 		for (RelativeScore s : goodTrades) {
 			int count = Math.max( 
 				Math.min(colorToCount.get(s.toGive), colorToCount.get(s.toTake)),
