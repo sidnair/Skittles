@@ -74,7 +74,8 @@ public class Inventory {
 	}
 	
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
+		PriorityQueue<Skittle> ret =
+			new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
 		for (Skittle s: skittles) {
 			if (!s.isTasted() && s.getCount() > 0) {
 				ret.add(s);
@@ -104,7 +105,8 @@ public class Inventory {
 	}
 	
 	public PriorityQueue<Skittle> skittlesByValuesLowest() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValueLow());
+		PriorityQueue<Skittle> ret =
+			new PriorityQueue<Skittle>(10, new SkittleComparatorByValueLow());
 		for (Skittle s: skittles) {
 			if (s.getCount() > 0) {
 				ret.add(s);
@@ -131,13 +133,7 @@ public class Inventory {
 	private class SkittleComparatorByValueLow implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
-			if (x.getValue() < y.getValue()) {
-				return -1;
-			}
-			if (x.getValue() > y.getValue()) {
-				return 1;
-			}
-			return 0;
+			return (int) (x.getCurrentWorth() - y.getCurrentWorth());
 		}
 	}
 	

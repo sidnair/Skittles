@@ -4,7 +4,6 @@ package skittles.g2;
 import java.util.ArrayList;
 
 import skittles.sim.Game;
-import scala.actors.threadpool.Arrays;
 import skittles.sim.Offer;
 
 /**
