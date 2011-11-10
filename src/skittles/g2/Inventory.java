@@ -5,10 +5,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import skittles.g5.sim.Game;
+
 public class Inventory {
 	
 	private Skittle[] skittles;
 	private int startingSkittles;
+	private int[] ranking;
 	
 	public Inventory(int[] aintInHand) {
 		startingSkittles = 0;
@@ -17,6 +20,11 @@ public class Inventory {
 			skittles[i] = new Skittle(aintInHand[i], i);
 			this.startingSkittles += aintInHand[i];
 		}
+		ranking = new int[aintInHand.length];
+		for (int i = 0; i < ranking.length; i++) {
+			ranking[i] = i;
+		}
+		System.out.println("Current Ranking: " + Game.arrayToString(ranking));
 	}
 	
 	public int getStartingSkittles() {
@@ -73,6 +81,48 @@ public class Inventory {
 	
 	public int getNumColors() {
 		return skittles.length;
+	}
+	
+	public void updateSkittleRankings() {
+		for (int i = 0; i < ranking.length - 1; i++) {
+			for (int j = i+1; j < ranking.length; j++) {
+				//Ordering should be positive, unknown, negative
+				Skittle first = skittles[ranking[i]];
+				Skittle second = skittles[ranking[j]];
+				if (first.isTasted()) {
+					if (second.isTasted()) {
+						if (first.getCurrentWorth() < second.getCurrentWorth()) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					} else {
+						if (first.getCurrentWorth() < 0) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					}
+				} else {
+					if (second.isTasted()) {
+						if (second.getCurrentWorth() > 0) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					}
+				}
+			}
+		}
+		System.out.println("Current Ranking: " + Game.arrayToString(ranking));
+		for (int i = 0; i < ranking.length; i++) {
+			if (skittles[ranking[i]].isTasted()) {
+				System.out.println(skittles[ranking[i]].getCurrentWorth());
+			}
+			else {
+				System.out.println("Don't know");
+			}
+		}
 	}
 	
 	public double[] getColorValues() {
