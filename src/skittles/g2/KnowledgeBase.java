@@ -289,6 +289,11 @@ public class KnowledgeBase {
 
 		return 0.0;
 	}
+	
+	//Is not called yet
+	public void triggerEndStage(int player) {
+		playerStage[player] = STAGE.END;
+	}
 
 	public void updateCountByTurn() {
 		if (turn == 0) {
@@ -310,24 +315,39 @@ public class KnowledgeBase {
 		}	
 		for (int j = 0; j < playerCount; j++) {
 			if (playerStage[j] == STAGE.HOARD) {
-				int zeroCount = 0;
-				for (int i = 0; i < inventory.size(); i++) {
-					if (estimatedCount[j][i] <= 0) {
-						zeroCount++;
-					}
-				}
-				for (int i = 0; i < inventory.size(); i++) {
-					if (estimatedCount[j][i] > 0) {
-						estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
-					}
-				}
+				hoardEstimate(j);
 			}
-			if (playerStage[j] == STAGE.END) {
-				;
-				//The heuristic of not trading means eating doesn't work.. rethinking
+			else if (playerStage[j] == STAGE.END) {
+				endEstimate(j);
 			}
 		}
 		turn++;
+	}
+
+	private void hoardEstimate(int j) {
+		int zeroCount = 0;
+		for (int i = 0; i < inventory.size(); i++) {
+			if (estimatedCount[j][i] <= 0) {
+				zeroCount++;
+			}
+		}
+		for (int i = 0; i < inventory.size(); i++) {
+			if (estimatedCount[j][i] > 0) {
+				estimatedCount[j][i] -= 1.0 / (inventory.size() - zeroCount);
+			}
+		}
+	}
+
+	private void endEstimate(int j) {
+		int currMaxIndex = 0;
+		double currMaxCount = 0;
+		for (int i = 0; i < inventory.size(); i++) {
+			if (estimatedCount[j][i] > currMaxCount) {
+				currMaxIndex = i;
+				currMaxCount = estimatedCount[j][i];
+			}
+		}
+		estimatedCount[j][currMaxIndex] -= currMaxCount;
 	}
 
 	public void updateCountByOffer(Offer o) {
