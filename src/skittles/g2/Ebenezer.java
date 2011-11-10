@@ -12,7 +12,7 @@ import skittles.sim.Player;
 
 public class Ebenezer extends Player {
 
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	private String className;
 	private int playerIndex;
@@ -62,18 +62,35 @@ public class Ebenezer extends Player {
 			toEat[next.getColor()] = 1;
 			mouth.put(next, 1);
 			return;
+		} else {
+			
 		}
-		
-		
-		// TODO - sometimes eat the positive Skittles one at a time.
-		// TODO - make sure not to do this when we've reached our biggest pile.
-		
-		/*
-		 * Eat the positive Skittles in groups.
-		 */
+
 		PriorityQueue<Skittle> skittlesByValuesLowest =
 			inventory.skittlesByValuesLowest();
-		Skittle next = skittlesByValuesLowest.remove();
+		Skittle next = null;
+		// if there are no negatives and we've tasted all skittles and there are more than one pile left,
+		// eat positives one at a time
+		if(skittlesByValuesLowest.size() > 1) {
+			next = skittlesByValuesLowest.peek();
+		
+			Offer bestTrade = getOurBestTrade();
+			
+			if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
+				if(next.getCount() == 1) {
+					skittlesByValuesLowest.remove();
+				}
+				next.setTasted(true);
+				toEat[next.getColor()] = 1;
+				mouth.put(next, 1);
+				return;
+			}
+		}
+		
+		/*
+		 * Eat the positive Skittles in groups if we can't make good trades
+		 */
+		next = skittlesByValuesLowest.remove();
 		next.setTasted(true);
 		toEat[next.getColor()] = next.getCount();
 		mouth.put(next, next.getCount());
@@ -96,6 +113,19 @@ public class Ebenezer extends Player {
 	 */
 	public void makeOffer(Offer offTemp) {
 
+		offTemp = getOurBestTrade();
+
+		// This is a hack for the meantime because we cannot update if we pick
+		// our own offer.
+		ourOffer = offTemp;
+	}
+
+	/**
+	 * returns the best trade we can make
+	 */
+	private Offer getOurBestTrade() {
+		Offer offTemp = new Offer(getPlayerIndex(), inventory.getNumColors());
+		
 		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 
 		int[] toOffer = new int[inventory.getSkittles().length];
@@ -122,10 +152,8 @@ public class Ebenezer extends Player {
 			toReceive[wantedColor.getColor()] = count;
 			offTemp.setOffer(toOffer, toReceive);
 		}
-
-		// This is a hack for the meantime because we cannot update if we pick
-		// our own offer.
-		ourOffer = offTemp;
+		
+		return offTemp;
 	}
 
 	@Override
