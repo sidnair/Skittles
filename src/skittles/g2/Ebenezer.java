@@ -73,24 +73,24 @@ public class Ebenezer extends Player {
 		// eat positives one at a time
 		if(skittlesByValuesLowest.size() > 1) {
 			next = skittlesByValuesLowest.peek();
-		}
 		
-		Offer bestTrade = getOurBestTrade();
-		
-		if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
-			if(next.getCount() == 1) {
-				skittlesByValuesLowest.remove();
+			Offer bestTrade = getOurBestTrade();
+			
+			if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
+				if(next.getCount() == 1) {
+					skittlesByValuesLowest.remove();
+				}
+				next.setTasted(true);
+				toEat[next.getColor()] = 1;
+				mouth.put(next, 1);
+				return;
 			}
-			next.setTasted(true);
-			toEat[next.getColor()] = 1;
-			mouth.put(next, 1);
-			return;
 		}
 		
 		/*
 		 * Eat the positive Skittles in groups if we can't make good trades
 		 */
-		Skittle next = skittlesByValuesLowest.remove();
+		next = skittlesByValuesLowest.remove();
 		next.setTasted(true);
 		toEat[next.getColor()] = next.getCount();
 		mouth.put(next, next.getCount());
