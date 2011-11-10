@@ -320,8 +320,8 @@ public class KnowledgeBase {
 					double jiChange = gainedRatios[i] / givenRatios[j];
 					double ijChange = gainedRatios[i] / givenRatios[j];
 					if (dislike) {
-						jiChange *= 0.25;
-						ijChange *= 0.25;
+						jiChange *= -0.5;
+						ijChange *= -0.5;
 					}
 					playerWants[j][i] += jiChange;
 					playerWants[i][j] -= ijChange;
