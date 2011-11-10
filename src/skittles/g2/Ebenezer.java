@@ -143,6 +143,8 @@ public class Ebenezer extends Player {
 		Offer best = getBestOffer(willingToAdd, willingToGive);
 		if (best != null) {
 			offTemp.setOffer(best.getOffer(), best.getDesire());
+		} else {
+			System.exit(1);
 		}
 
 		// This is a hack for the meantime because we cannot update if we pick
