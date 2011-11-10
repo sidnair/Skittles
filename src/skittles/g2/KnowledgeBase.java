@@ -284,8 +284,28 @@ public class KnowledgeBase {
 		// ???, profit
 		return 0.0;
 	}
-
-	public double countProbability(int count, int color, int player) {
+	
+	public double tradeCountProbability(Offer offer) {
+		double probability = 0;
+		for (int i = 0; i < playerCount; i++) {
+			if (i == this.selfIndex) {
+				continue;
+			}
+			probability = Math.max(tradeCountProbabilityPerPlayer(offer, i), probability);
+		}
+		return probability;
+	}
+	
+	private double tradeCountProbabilityPerPlayer(Offer offer, int player) {
+		int[] whatWeWant = offer.getDesire();
+		double probability = 1;
+		for (int i = 0; i < whatWeWant.length; i++) {
+			probability *= countProbability(whatWeWant[i], i, player);
+		}
+		return 0.0;
+	}
+	
+	private double countProbability(int count, int color, int player) {
 		double ourEstimate = estimatedCount[player][color];
 		return Math.max((1 - (count / (ourEstimate  + 1))), 0);
 	}
