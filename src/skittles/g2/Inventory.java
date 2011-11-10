@@ -24,7 +24,6 @@ public class Inventory {
 		for (int i = 0; i < ranking.length; i++) {
 			ranking[i] = i;
 		}
-		System.out.println("Current Ranking: " + Game.arrayToString(ranking));
 	}
 	
 	public int getStartingSkittles() {
@@ -112,15 +111,6 @@ public class Inventory {
 						}
 					}
 				}
-			}
-		}
-		System.out.println("Current Ranking: " + Game.arrayToString(ranking));
-		for (int i = 0; i < ranking.length; i++) {
-			if (skittles[ranking[i]].isTasted()) {
-				System.out.println(skittles[ranking[i]].getCurrentWorth());
-			}
-			else {
-				System.out.println("Don't know");
 			}
 		}
 	}
