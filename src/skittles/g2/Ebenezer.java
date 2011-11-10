@@ -102,7 +102,6 @@ public class Ebenezer extends Player {
 		Offer bestOffer = getOurBestTrade();
 		offTemp.setOffer(bestOffer.getOffer(), bestOffer.getDesire());
 		ourOffer = offTemp;
-//		System.exit(1);
 	}
 
 	/**
@@ -120,12 +119,10 @@ public class Ebenezer extends Player {
 			if (s.getHoardingValue() >= 0 || !s.isTasted()) {
 				willingToAdd.add(s.getColor());
 			}
-			// We're willing to give anything; the value calculation of offers
-			// will account for the fact that we don't want to give away our
-			// best colors.
-			
-			// TODO - this prevents adding the top skittle manually temporarily.
-			// This should be removed.
+
+			// We're willing to give almost anything; the value calculation of 
+			// offers will account for the fact that we don't want to give away
+			// our best colors. Don't include our hoarding color for pruning.
 			if (sortedSkittles.get(0) != s) {
 				willingToGive.add(s.getColor());
 			}
