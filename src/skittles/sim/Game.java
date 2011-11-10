@@ -103,7 +103,7 @@ public class Game
 					System.out.println( "Random color happiness:" );
 					for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 					{
-						System.out.print( adblTastes[ intColorIndex ] + " " );
+						System.out.printf("%.2f\t", adblTastes[ intColorIndex ]);
 					}
 					System.out.println();
 				}
