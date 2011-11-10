@@ -302,7 +302,7 @@ public class KnowledgeBase {
 		for (int i = 0; i < whatWeWant.length; i++) {
 			probability *= countProbability(whatWeWant[i], i, player);
 		}
-		return 0.0;
+		return probability;
 	}
 	
 	private double countProbability(int count, int color, int player) {
