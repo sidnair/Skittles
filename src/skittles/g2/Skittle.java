@@ -53,7 +53,7 @@ public class Skittle {
 	 */
 	public double getCurrentWorth() {
 		if (this.value > 0) {
-			return this.count*this.count*this.value;
+			return this.count * this.count*this.value;
 		} else {
 			return this.value * this.count;
 		}
@@ -68,6 +68,15 @@ public class Skittle {
 		}
 		ret += "]";
 		return ret;
+	}
+	
+	public double getHoardingValue() {
+		// TODO - incorporate tradability?
+		
+		// Have some small positive value for getting an untasted color; this
+		// means that having more of an untasted color is better than having
+		// less of another untasted color and than having a color of value 0.
+		return this.isTasted() ? this.getCurrentWorth() : 0.001;
 	}
 
 }

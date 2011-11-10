@@ -2,6 +2,9 @@
 package skittles.g2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 import skittles.sim.Game;
 import skittles.sim.Offer;
@@ -85,6 +88,10 @@ public class KnowledgeBase {
 		this.turn = 0;
 	}
 	
+	private int getEstimatedPlayerCount(int color, int player) {
+		return (int) estimatedCount[player][color];
+	}
+	
 	public double getCoeffecient(int x) {
 		double temp = 0.0;
         // coefficients
@@ -103,7 +110,21 @@ public class KnowledgeBase {
 			marketHistory.addUnsuccessfulTrade(offer.getOffer(), offer.getDesire());
 		}
 	}
-
+	
+	public double getOtherHappiness(Offer o) {
+		double h = 0;
+		for (int i = 0; i < playerCount; i++) {
+			double newHapp = getOtherHappiness(o, i);
+			if (newHapp > h) {
+				h = newHapp;
+			}
+		}
+		return h;
+	}
+	
+	private double getOtherHappiness(Offer o, int i) {
+		return getOtherHappiness(o.getDesire(), o.getOffer(), i);
+	}
 	
 	// giving is what they are giving
 	// taking is what they are taking
@@ -135,6 +156,66 @@ public class KnowledgeBase {
 			relativeWants.add(new double[skittleCount][skittleCount]);
 		}
 		return relativeWants;
+	}
+	
+	public Offer getBestOfferPerPlayer(ArrayList<Skittle> want,
+			ArrayList<Skittle> giveUp, int p, int playerIndex) {
+		int skittleCount = inventory.getNumColors();
+		Offer o = new Offer(playerIndex, skittleCount);
+		int[] toGive = new int[skittleCount];
+		int[] toRequest = new int[skittleCount];
+		
+		ArrayList<RelativeScore> goodTrades = new ArrayList<RelativeScore>();
+		HashMap<Integer, Integer> colorToCount = new HashMap<Integer, Integer>();
+		
+		for (int i = 0; i < skittleCount; i++) {
+			for (int j = 0; j < i; j++) {
+				// i = what they are giving, j = what they are taking;
+				// positive score means they like it
+				double theirVal = relativeWants.get(p)[i][j];
+				if (theirVal > 0 && want.contains(i) &&
+						giveUp.contains(j)) {
+					goodTrades.add(new RelativeScore(theirVal, j, i));
+					colorToCount.put(i, Math.min(
+							getEstimatedPlayerCount(i, playerIndex),
+							inventory.getSkittle(i).getCount()));
+					colorToCount.put(j, Math.min(
+							getEstimatedPlayerCount(j, playerIndex),
+							inventory.getSkittle(j).getCount()));
+				}
+			}
+		}
+		Collections.sort(goodTrades);
+		for (RelativeScore s : goodTrades) {
+			int count = Math.max( 
+				Math.min(colorToCount.get(s.toGive), colorToCount.get(s.toTake)),
+				0);
+			colorToCount.put(s.toGive, colorToCount.get(s.toGive) - count);
+			colorToCount.put(s.toTake, colorToCount.get(s.toTake) - count);
+			toGive[s.toGive] += count;
+			toRequest[s.toTake] += count;
+		}
+		o.setOffer(toGive, toRequest);
+		return o;
+	}
+	
+	private class RelativeScore implements Comparable<RelativeScore> {
+		private double score;
+		private int toGive;
+		private int toTake;
+		
+		// to give to them, to take from them
+		public RelativeScore(double score, int toGive, int toTake) {
+			this.score = score;
+			this.toGive = toGive;
+			this.toTake = toTake;
+		}
+
+		@Override
+		public int compareTo(RelativeScore other) {
+			// 1000 avoids small numbers being rounded to 0
+			return (int) (1000 * (this.score - other.score));
+		}
 	}
 	
 	public void updateRelativeWants(Offer[] offers) {
@@ -319,6 +400,22 @@ public class KnowledgeBase {
 		return Math.max((1 - (count / (ourEstimate  + 1))), 0);
 	}
 	
+	public double scoreOffer(Offer o) {
+		double score = 0;
+		for (int i = 0; i < playerCount; i++) {
+			double newscore = scoreOffer(o, i);
+			if (newscore > score) {
+				score = newscore;
+			}
+		}
+		return score;
+	}
+	
+	public double scoreOffer(Offer o, int player) {
+		return this.tradeUtility(o) * getOtherHappiness(o, player) *
+				tradeCountProbabilityPerPlayer(o, player);
+	}
+	
 	//Is not called yet
 	public void triggerEndStage(int player) {
 		playerStage[player] = STAGE.END;
@@ -344,11 +441,8 @@ public class KnowledgeBase {
 			}
 		}	
 		for (int j = 0; j < playerCount; j++) {
-			if (playerStage[j] == STAGE.HOARD) {
+			if (playerStage[j] != STAGE.DISCOVERY) {
 				hoardEstimate(j);
-			}
-			else if (playerStage[j] == STAGE.END) {
-				endEstimate(j);
 			}
 		}
 	}
@@ -367,18 +461,6 @@ public class KnowledgeBase {
 				estimatedCount[j][i] = 0;
 			}
 		}
-	}
-
-	private void endEstimate(int j) {
-		int currMaxIndex = 0;
-		double currMaxCount = 0;
-		for (int i = 0; i < inventory.size(); i++) {
-			if (estimatedCount[j][i] > currMaxCount) {
-				currMaxIndex = i;
-				currMaxCount = estimatedCount[j][i];
-			}
-		}
-		estimatedCount[j][currMaxIndex] -= currMaxCount;
 	}
 
 	public void updateCountByOffer(Offer o) {
@@ -415,5 +497,9 @@ public class KnowledgeBase {
 		}
 		ret += "]";
 		return ret;
+	}
+	
+	public boolean isActive(int player) {
+		return playerStage[player] != STAGE.END;
 	}
 }
