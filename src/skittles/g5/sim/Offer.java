@@ -35,7 +35,7 @@ public class Offer
 			}
 			if ( intOfferCount != intDesireCount )
 			{
-				System.out.println( "Player #" + intOfferedByIndex + "'s offer is invalid" );
+//				System.out.println( "Player #" + intOfferedByIndex + "'s offer is invalid" );
 			}
 			else
 			{

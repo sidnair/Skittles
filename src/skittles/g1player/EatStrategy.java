@@ -46,7 +46,6 @@ public class EatStrategy {
 				break;
 			}
 		}
-		System.out.print("");
 		
 	    if(info.isPlayerInactive(-1) || info.isPlayerInactive(info.getIntPlayerIndex())){
 			/*

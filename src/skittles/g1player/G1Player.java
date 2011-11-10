@@ -35,17 +35,17 @@ public class G1Player extends Player {
 		int[] aintDesire = new int[info.getIntColorNum()];
 		offerStrategy.getOffer(aintOffer,aintDesire,info);
 		
-		System.out.print("Player 2's offer: [");
+//		System.out.print("Player 2's offer: [");
 		for (int o : aintOffer)
 		{
-			System.out.print(o + "  ");
+//			System.out.print(o + "  ");
 		}
-		System.out.print("] <--> [");
+//		System.out.print("] <--> [");
 		for (int d : aintDesire)
 		{
-			System.out.print(d + "  ");
+//			System.out.print(d + "  ");
 		}
-		System.out.println("]");
+//		System.out.println("]");
 
 		G1Player.printArray(aintOffer, "aintOffer");
 		G1Player.printArray(aintDesire, "aintDesire");

@@ -38,7 +38,7 @@ public class Ebenezer extends Player {
 	public void eat(int[] toEat) {
 		// Update everyone else's count
 		kb.updateCountByTurn();
-		kb.printEstimateCount();
+//		kb.printEstimateCount();
 
 		// Prioritize skittles that you haven't tasted before.
 		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();
@@ -132,6 +132,8 @@ public class Ebenezer extends Player {
 		Offer best = getBestOffer(willingToAdd, willingToGive);
 		if (best != null) {
 			offTemp.setOffer(best.getOffer(), best.getDesire());
+		} else {
+			System.exit(1);
 		}
 
 		// This is a hack for the meantime because we cannot update if we pick
