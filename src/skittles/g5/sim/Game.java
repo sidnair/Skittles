@@ -108,12 +108,12 @@ public class Game
 				{
 					double dblMean = Double.parseDouble( astrTastes[ 1 ] );
 					adblTastes = randomTastes( dblMean );
-					System.out.println( "Random color happiness:" );
+//					System.out.println( "Random color happiness:" );
 					for ( int intColorIndex = 0; intColorIndex < intColorNum; intColorIndex ++ )
 					{
-						System.out.print( adblTastes[ intColorIndex ] );
+//						System.out.print( adblTastes[ intColorIndex ] );
 					}
-					System.out.println();
+//					System.out.println();
 				}
 				String strInHand = getTagValue( elmPlayer, "InHand" );
 				int[] aintInHand = new int[ intColorNum ];
@@ -164,7 +164,7 @@ public class Game
 		for (int i=0;i<numberOfPermutations;i++) {
 			if(!doAllPermutations && i>0)
 				break;
-			System.out.println("\n\nGame  "+(i+1)+" starts");
+//			System.out.println("\n\nGame  "+(i+1)+" starts");
 
 			alPlayers = new ArrayList< Player >();			// players
 			 alPlayerStatus = new ArrayList< PlayerStatus >();		// status of players for simulator's record
@@ -562,7 +562,7 @@ public class Game
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
 		Random rdmGenerator = new Random();
-		System.out.println( "Random order is:" );
+//		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
 			int intRandom = rdmGenerator.nextInt( intPlayerNum - intPlayerIndex );
@@ -694,7 +694,7 @@ public class Game
 		for (int i=0;i<tempArray.length;i++) {
 			printingString=printingString+" , "+String.format("%8d",tempArray[i]);
 		}
-		System.out.println(message+"  "+printingString);
+//		System.out.println(message+"  "+printingString);
 	}
 	
 	

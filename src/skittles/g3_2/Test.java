@@ -73,7 +73,7 @@ public class Test {
 		
 		trading = smallInfo.pile.getTradingColorsByPreference();
 		int[] hoarding = smallInfo.pile.getHoardingColorsByPreference();
-		System.out.println(smallInfo.pile);
+//		System.out.println(smallInfo.pile);
 		assert hoarding.length == smallInfo.hoardingCount();
 		assert trading.length == smallInfo.hand.length - smallInfo.hoardingCount();
 		assert hoarding[0] == 1;
@@ -92,7 +92,7 @@ public class Test {
 		hoarding = bigInfo.pile.getHoardingColorsByPreference();
 		assert hoarding.length == bigInfo.hoardingCount();
 		assert trading.length == bigInfo.hand.length - bigInfo.hoardingCount();
-		System.out.println(bigInfo.pile);
+//		System.out.println(bigInfo.pile);
 	}
 	
 	public void testInfoEvaluate(){

@@ -38,7 +38,7 @@ public class Ebenezer extends Player {
 	public void eat(int[] toEat) {
 		// Update everyone else's count
 		kb.updateCountByTurn();
-		kb.printEstimateCount();
+//		kb.printEstimateCount();
 
 		// Prioritize skittles that you haven't tasted before.
 		PriorityQueue<Skittle> untasted = inventory.untastedSkittlesByCount();

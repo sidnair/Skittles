@@ -494,13 +494,13 @@ public class Game
 		}
 		int[] aintOrder = new int[ intPlayerNum ];
 		Random rdmGenerator = new Random(getSeed());
-		System.out.println( "Random order is:" );
+//		System.out.println( "Random order is:" );
 		for ( int intPlayerIndex = 0; intPlayerIndex < intPlayerNum; intPlayerIndex ++ )
 		{
 			int intRandom = rdmGenerator.nextInt( intPlayerNum - intPlayerIndex );
 			aintOrder[ intPlayerIndex ] = alPlayerIndices.get( intRandom );
 			alPlayerIndices.remove( intRandom );
-			System.out.print( aintOrder[ intPlayerIndex ] + " " );
+//			System.out.print( aintOrder[ intPlayerIndex ] + " " );
 		}
 		System.out.println( "\n" );
 		return aintOrder;
