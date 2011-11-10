@@ -88,6 +88,10 @@ public class KnowledgeBase {
 		this.turn = 0;
 	}
 	
+	private int getEstimatedPlayerCount(int color, int player) {
+		return (int) estimatedCount[player][color];
+	}
+	
 	public double getCoeffecient(int x) {
 		double temp = 0.0;
         // coefficients
@@ -161,8 +165,8 @@ public class KnowledgeBase {
 		int[] toGive = new int[skittleCount];
 		int[] toRequest = new int[skittleCount];
 		
-		ArrayList<RelativeScore> goodTrades;
-		HashMap<Integer, Integer> colorToCount;
+		ArrayList<RelativeScore> goodTrades = new ArrayList<RelativeScore>();
+		HashMap<Integer, Integer> colorToCount = new HashMap<Integer, Integer>();
 		
 		for (int i = 0; i < skittleCount; i++) {
 			for (int j = 0; j < i; j++) {
