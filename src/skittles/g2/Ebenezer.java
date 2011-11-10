@@ -102,7 +102,7 @@ public class Ebenezer extends Player {
 		Offer bestOffer = getOurBestTrade();
 		offTemp.setOffer(bestOffer.getOffer(), bestOffer.getDesire());
 		ourOffer = offTemp;
-		System.exit(1);
+		//System.exit(1);
 	}
 
 	/**
