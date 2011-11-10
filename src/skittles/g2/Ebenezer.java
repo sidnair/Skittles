@@ -24,7 +24,7 @@ public class Ebenezer extends Player {
 	private Offer[] lastOfferSet;
 
 	@Override
-	public void initialize(int numPlayers, int playerIndex,
+	public void initialize(int numPlayers, double tasteDistMean, int playerIndex,
 			String className, int[] inHand) {
 		this.playerIndex = playerIndex;
 		this.className = className;
