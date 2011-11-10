@@ -95,50 +95,18 @@ public class Ebenezer extends Player {
 	 * Makes an offer.
 	 */
 	public void makeOffer(Offer offTemp) {
-		ArrayList<Skittle> tastedSkittles = new ArrayList<Skittle>();
-		for (Skittle s : inventory.getSkittles()) {
-			if (s.isTasted()) {
-				tastedSkittles.add(s);
-			}
-		}
 
-		// sort skittles by how much we like their color
-		Collections.sort(tastedSkittles, new Comparator<Skittle>() {
-			@Override
-			public int compare(Skittle first, Skittle second) {
-				double diff = first.getValue() - second.getValue();
-				if (diff > 0) {
-					return -1;
-				} else if (diff == 0) {
-					return 0;
-				} else {
-					return 1;
-				}
-			}
-		});
-		
-		if (DEBUG) {
-			System.out.println("\ntasted:");
-			for (Skittle s : tastedSkittles)
-				System.out.println(s.toString());
-		}
+		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 
-		// the two sides of our new offer
 		int[] toOffer = new int[inventory.getSkittles().length];
 		int[] toReceive = new int[inventory.getSkittles().length];
 
-		// if we haven't tasted more than 3 colors, make a null offer. (0-for-0)
-		if (tastedSkittles.size() < 3) {
-			offTemp.setOffer(toOffer, toReceive);
-			return;
-		}
-
-		// if we've tasted more than two colors, get our favorite one
-		Skittle wantedColor = tastedSkittles.size() > 2 ? tastedSkittles.get(0) : null;
+		// TODO - want multiple colors
+		Skittle wantedColor = sortedSkittles.get(0);
 
 		// starting with third-best color, find the color with the highest
 		// market value.
-		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, tastedSkittles);
+		Skittle unwantedColor = kb.getHighestMarketValueColorFrom(2, sortedSkittles);
 
 		// if we know what color we want AND what color we don't want,
 		// set the offer to SEND unwantedColor and RECEIVE wantedColor
