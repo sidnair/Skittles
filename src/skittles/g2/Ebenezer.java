@@ -12,7 +12,7 @@ import skittles.sim.Player;
 
 public class Ebenezer extends Player {
 
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	private String className;
 	private int playerIndex;
@@ -25,7 +25,7 @@ public class Ebenezer extends Player {
 	private Offer[] lastOfferSet;
 
 	@Override
-	public void initialize(int numPlayers, int playerIndex,
+	public void initialize(int numPlayers, double tasteDistMean, int playerIndex,
 			String className, int[] inHand) {
 		this.playerIndex = playerIndex;
 		this.className = className;
@@ -64,18 +64,35 @@ public class Ebenezer extends Player {
 			toEat[next.getColor()] = 1;
 			mouth.put(next, 1);
 			return;
+		} else {
+			
 		}
-		
-		
-		// TODO - sometimes eat the positive Skittles one at a time.
-		// TODO - make sure not to do this when we've reached our biggest pile.
-		
-		/*
-		 * Eat the positive Skittles in groups.
-		 */
+
 		PriorityQueue<Skittle> skittlesByValuesLowest =
 			inventory.skittlesByValuesLowest();
-		Skittle next = skittlesByValuesLowest.remove();
+		Skittle next = null;
+		// if there are no negatives and we've tasted all skittles and there are more than one pile left,
+		// eat positives one at a time
+		if(skittlesByValuesLowest.size() > 1) {
+			next = skittlesByValuesLowest.peek();
+		
+			Offer bestTrade = getOurBestTrade();
+			
+			if(kb.tradeUtility(bestTrade) * kb.tradeCountProbability(bestTrade) > next.getValue()) {
+				if(next.getCount() == 1) {
+					skittlesByValuesLowest.remove();
+				}
+				next.setTasted(true);
+				toEat[next.getColor()] = 1;
+				mouth.put(next, 1);
+				return;
+			}
+		}
+		
+		/*
+		 * Eat the positive Skittles in groups if we can't make good trades
+		 */
+		next = skittlesByValuesLowest.remove();
 		next.setTasted(true);
 		toEat[next.getColor()] = next.getCount();
 		mouth.put(next, next.getCount());
@@ -98,6 +115,19 @@ public class Ebenezer extends Player {
 	 */
 	public void makeOffer(Offer offTemp) {
 
+		offTemp = getOurBestTrade();
+
+		// This is a hack for the meantime because we cannot update if we pick
+		// our own offer.
+		ourOffer = offTemp;
+	}
+
+	/**
+	 * returns the best trade we can make
+	 */
+	private Offer getOurBestTrade() {
+		Offer offTemp = new Offer(getPlayerIndex(), inventory.getNumColors());
+		
 		ArrayList<Skittle> sortedSkittles = inventory.getSortedSkittleArray();
 
 		int[] toOffer = new int[inventory.getSkittles().length];
@@ -122,21 +152,25 @@ public class Ebenezer extends Player {
 			}
 		}
 		
-		getBestOffer();
+		Offer best = getBestOffer(willingToAdd, willingToGive);
+		offTemp.setOffer(best.getOffer(), best.getDesire());
 
 		// This is a hack for the meantime because we cannot update if we pick
 		// our own offer.
 		ourOffer = offTemp;
+		return offTemp;
 	}
 	
-	public Offer getBestOffer() {
+	public Offer getBestOffer(ArrayList<Skittle> willingToAdd,
+			ArrayList<Skittle> willingToGive) {
 		Offer o = null;
 		for (int i = 0; i < numPlayers; i++) {
 			if (i == playerIndex) {
 				continue;
 			}
-			Offer iOffer = getBestOffer(i);
-			if (o == null || getOfferValue(o) < getOfferValue()) {
+			Offer iOffer = kb.getBestOfferPerPlayer(willingToAdd, willingToGive,
+					i, playerIndex);
+			if (o == null || kb.scoreOffer(o) < kb.scoreOffer(iOffer)) {
 				o = iOffer;
 			}
 		}

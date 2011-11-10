@@ -31,6 +31,8 @@ public class KnowledgeBase {
 	private ArrayList<PreferenceHistory> playerHistories;
 	private ArrayList<Offer> successfulOffers;
 	private ArrayList<Offer> unsuccessfulOffers;
+	
+	private int skittleCount;
 
 
 	private double[][] estimatedCount;
@@ -96,6 +98,21 @@ public class KnowledgeBase {
 		}
 	}
 	
+	public double getOtherHappiness(Offer o) {
+		double h = 0;
+		for (int i = 0; i < playerCount; i++) {
+			double newHapp = getOtherHappiness(o, i);
+			if (newHapp > h) {
+				h = newHapp;
+			}
+		}
+		return h;
+	}
+	
+	private double getOtherHappiness(Offer o, int i) {
+		return getOtherHappiness(o.getDesire(), o.getOffer(), i);
+	}
+	
 	// giving is what they are giving
 	// taking is what they are taking
 	public double getOtherHappiness(int[] giving, int[] taking, 
@@ -128,14 +145,14 @@ public class KnowledgeBase {
 		return relativeWants;
 	}
 	
-	public Offer getIntersectingOffer(ArrayList<Skittle> want,
+	public Offer getBestOfferPerPlayer(ArrayList<Skittle> want,
 			ArrayList<Skittle> giveUp, int p, int playerIndex) {
 		int skittleCount = inventory.getNumColors();
 		Offer o = new Offer(playerIndex, skittleCount);
 		int[] toGive = new int[skittleCount];
 		int[] toRequest = new int[skittleCount];
 		
-		ArrayList<Score> goodTrades;
+		ArrayList<RelativeScore> goodTrades;
 		HashMap<Integer, Integer> colorToCount;
 		
 		for (int i = 0; i < skittleCount; i++) {
@@ -145,44 +162,44 @@ public class KnowledgeBase {
 				double theirVal = relativeWants.get(p)[i][j];
 				if (theirVal > 0 && want.contains(i) &&
 						giveUp.contains(j)) {
-					goodTrades.add(new Score(theirVal, j, i));
+					goodTrades.add(new RelativeScore(theirVal, j, i));
 					colorToCount.put(i, Math.min(
-							getPlayerCount(i),
-							ourCount(i));
+							getEstimatedPlayerCount(i, playerIndex),
+							inventory.getSkittle(i).getCount()));
 					colorToCount.put(j, Math.min(
-							getPlayerCount(j),
-							ourCount(j));
+							getEstimatedPlayerCount(j, playerIndex),
+							inventory.getSkittle(j).getCount()));
 				}
 			}
 		}
 		Collections.sort(goodTrades);
-		for (Score s : goodTrades) {
+		for (RelativeScore s : goodTrades) {
 			int count = Math.max( 
 				Math.min(colorToCount.get(s.toGive), colorToCount.get(s.toTake)),
 				0);
 			colorToCount.put(s.toGive, colorToCount.get(s.toGive) - count);
 			colorToCount.put(s.toTake, colorToCount.get(s.toTake) - count);
 			toGive[s.toGive] += count;
-			toGive[s.toTake] += count;
+			toRequest[s.toTake] += count;
 		}
 		o.setOffer(toGive, toRequest);
 		return o;
 	}
 	
-	private class Score implements Comparable<Score> {
+	private class RelativeScore implements Comparable<RelativeScore> {
 		private double score;
 		private int toGive;
 		private int toTake;
 		
 		// to give to them, to take from them
-		public Score(double score, int toGive, int toTake) {
+		public RelativeScore(double score, int toGive, int toTake) {
 			this.score = score;
 			this.toGive = toGive;
 			this.toTake = toTake;
 		}
 
 		@Override
-		public int compareTo(Score other) {
+		public int compareTo(RelativeScore other) {
 			// 1000 avoids small numbers being rounded to 0
 			return (int) (1000 * (this.score - other.score));
 		}
@@ -344,12 +361,46 @@ public class KnowledgeBase {
 		// ???, profit
 		return 0.0;
 	}
-
-	// TODO
-	public double countProbability(int count, int color, int player) {
-		// p players, c colors, n skittles per player
-
-		return 0.0;
+	
+	public double tradeCountProbability(Offer offer) {
+		double probability = 0;
+		for (int i = 0; i < playerCount; i++) {
+			if (i == this.selfIndex) {
+				continue;
+			}
+			probability = Math.max(tradeCountProbabilityPerPlayer(offer, i), probability);
+		}
+		return probability;
+	}
+	
+	private double tradeCountProbabilityPerPlayer(Offer offer, int player) {
+		int[] whatWeWant = offer.getDesire();
+		double probability = 1;
+		for (int i = 0; i < whatWeWant.length; i++) {
+			probability *= countProbability(whatWeWant[i], i, player);
+		}
+		return probability;
+	}
+	
+	private double countProbability(int count, int color, int player) {
+		double ourEstimate = estimatedCount[player][color];
+		return Math.max((1 - (count / (ourEstimate  + 1))), 0);
+	}
+	
+	public double scoreOffer(Offer o) {
+		double score = 0;
+		for (int i = 0; i < playerCount; i++) {
+			double newscore = scoreOffer(o, i);
+			if (newscore > score) {
+				score = newscore;
+			}
+		}
+		return score;
+	}
+	
+	public double scoreOffer(Offer o, int player) {
+		return this.tradeUtility(o) * getOtherHappiness(o, player) *
+				tradeCountProbabilityPerPlayer(o, player);
 	}
 	
 	//Is not called yet
