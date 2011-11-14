@@ -42,14 +42,18 @@ public class Skittle {
 		return this.tasted;
 	}
 	
-	public void setTasted() {
-		this.tasted = true;
+	public void setTasted(boolean tasted) {
+		this.tasted = tasted;
 	}
 	
-	/* If positive, we eat all at once otherwise one by one */
+	/*
+	 * Get the score from eating these Skittles. If the score is negative, we 
+	 * assume that we're eating them one by one. Otherwise, assume that we
+	 * eat them all as quickly as possible.
+	 */
 	public double getCurrentWorth() {
 		if (this.value > 0) {
-			return this.count*this.count*this.value;
+			return this.count * this.count*this.value;
 		} else {
 			return this.value * this.count;
 		}
@@ -64,6 +68,15 @@ public class Skittle {
 		}
 		ret += "]";
 		return ret;
+	}
+	
+	public double getHoardingValue() {
+		// TODO - incorporate tradability?
+		
+		// Have some small positive value for getting an untasted color; this
+		// means that having more of an untasted color is better than having
+		// less of another untasted color and than having a color of value 0.
+		return this.isTasted() ? this.getCurrentWorth() : 0.001 * this.count * this.count;
 	}
 
 }

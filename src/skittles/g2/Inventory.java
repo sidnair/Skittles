@@ -1,12 +1,17 @@
 package skittles.g2;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+
+import skittles.sim.Game;
 
 public class Inventory {
 	
 	private Skittle[] skittles;
 	private int startingSkittles;
+	private int[] ranking;
 	
 	public Inventory(int[] aintInHand) {
 		startingSkittles = 0;
@@ -14,6 +19,10 @@ public class Inventory {
 		for (int i = 0; i < skittles.length; i++) {
 			skittles[i] = new Skittle(aintInHand[i], i);
 			this.startingSkittles += aintInHand[i];
+		}
+		ranking = new int[aintInHand.length];
+		for (int i = 0; i < ranking.length; i++) {
+			ranking[i] = i;
 		}
 	}
 	
@@ -43,6 +52,16 @@ public class Inventory {
 		return true;
 	}
 	
+	public ArrayList<Skittle> getTastedSkittles() {
+		ArrayList<Skittle> tastedSkittles = new ArrayList<Skittle>();
+		for (Skittle s : skittles) {
+			if (s.isTasted()) {
+				tastedSkittles.add(s);
+			}
+		}
+		return tastedSkittles;
+	}
+	
 	public int size() {
 		return skittles.length;
 	}
@@ -63,6 +82,39 @@ public class Inventory {
 		return skittles.length;
 	}
 	
+	public void updateSkittleRankings() {
+		for (int i = 0; i < ranking.length - 1; i++) {
+			for (int j = i+1; j < ranking.length; j++) {
+				//Ordering should be positive, unknown, negative
+				Skittle first = skittles[ranking[i]];
+				Skittle second = skittles[ranking[j]];
+				if (first.isTasted()) {
+					if (second.isTasted()) {
+						if (first.getCurrentWorth() < second.getCurrentWorth()) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					} else {
+						if (first.getCurrentWorth() < 0) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					}
+				} else {
+					if (second.isTasted()) {
+						if (second.getCurrentWorth() > 0) {
+							int temp = ranking[i];
+							ranking[i] = ranking[j];
+							ranking[j] = temp;
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public double[] getColorValues() {
 		double[] values = new double[skittles.length];
 		
@@ -74,7 +126,8 @@ public class Inventory {
 	}
 	
 	public PriorityQueue<Skittle> untastedSkittlesByCount() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
+		PriorityQueue<Skittle> ret =
+			new PriorityQueue<Skittle>(10, new HighCountComparator());
 		for (Skittle s: skittles) {
 			if (!s.isTasted() && s.getCount() > 0) {
 				ret.add(s);
@@ -84,7 +137,7 @@ public class Inventory {
 	}
 	
 	public PriorityQueue<Skittle> tastedSkittlesByCount() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByCount());
+		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new HighCountComparator());
 		for (Skittle s: skittles) {
 			if (s.isTasted() && s.getCount() > 0) {
 				ret.add(s);
@@ -94,7 +147,8 @@ public class Inventory {
 	}
 		
 	public PriorityQueue<Skittle> leastNegativeSkittles() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValueHigh());
+		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10,
+				new HighValueComparator());
 		for (Skittle s: skittles) {
 			if (s.getValue() <= 0 && s.getValue() != Skittle.UNDEFINED_VALUE && s.getCount() > 0) {
 				ret.add(s);
@@ -104,7 +158,8 @@ public class Inventory {
 	}
 	
 	public PriorityQueue<Skittle> skittlesByValuesLowest() {
-		PriorityQueue<Skittle> ret = new PriorityQueue<Skittle>(10, new SkittleComparatorByValueLow());
+		PriorityQueue<Skittle> ret =
+			new PriorityQueue<Skittle>(10, new LowValueComparator());
 		for (Skittle s: skittles) {
 			if (s.getCount() > 0) {
 				ret.add(s);
@@ -113,45 +168,54 @@ public class Inventory {
 		return ret;
 	}
 	
-	/* Comparator for Skittles By Count */
-	private class SkittleComparatorByCount implements Comparator<Skittle> {
+	/*
+	 * Higher counts come first.
+	 */
+	protected class HighCountComparator implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
-			if (x.getCount() > y.getCount()) {
-				return -1;
-			}
-			if (x.getCount() < y.getCount()) {
-				return 1;
-			}
-			return 0;
+			return y.getCount() - x.getCount();
 		}
 	}
 
-	/* Comparator for Skittles PriQueue By Value */
-	private class SkittleComparatorByValueLow implements Comparator<Skittle> {
+	/*
+	 * Lower values first.
+	 */
+	protected class LowValueComparator implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
-			if (x.getValue() < y.getValue()) {
-				return -1;
-			}
-			if (x.getValue() > y.getValue()) {
-				return 1;
-			}
-			return 0;
+			return (int) (x.getCurrentWorth() - y.getCurrentWorth());
 		}
 	}
 	
-	/* Comparator for Skittles PriQueue By Value */
-	private class SkittleComparatorByValueHigh implements Comparator<Skittle> {
+	/*
+	 * Higher values first.
+	 */
+	protected class HighValueComparator implements Comparator<Skittle> {
 		@Override
 		public int compare(Skittle x, Skittle y) {
-			if (x.getValue() > y.getValue()) {
-				return -1;
-			}
-			if (x.getValue() < y.getValue()) {
-				return 1;
-			}
-			return 0;
+			return (int) (y.getCurrentWorth() - x.getCurrentWorth());
 		}
+	}
+	
+	/*
+	 * Low score first.
+	 */
+	protected class HoardingScoreComparator implements Comparator<Skittle> {
+		@Override
+		public int compare(Skittle x, Skittle y) {
+			return (int) (x.getHoardingValue() - y.getHoardingValue());
+		}
+	}
+	
+	/*
+	 * High hoarding score first.
+	 */
+	public ArrayList<Skittle> getSortedSkittleArray() {
+		ArrayList<Skittle> sortedSkittles = new ArrayList<Skittle>();
+		Collections.addAll(sortedSkittles, this.getSkittles());
+		Collections.sort(sortedSkittles, new HoardingScoreComparator());
+		Collections.reverse(sortedSkittles);
+		return sortedSkittles;
 	}
 }
