@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GameConfig>
 	<Game>
-		<ColorNum>100</ColorNum>
+		<ColorNum>25</ColorNum>
 		<SkittleNum>100</SkittleNum>
 	</Game>
 

@@ -1,5 +1,6 @@
 import MySQLdb
 import operator
+from collections import defaultdict
 
 #Connection Variables
 host = "localhost"
@@ -56,83 +57,103 @@ def replacePlayers(s):
 	return s
 	
 
-def getScores(skittle, color, player, mean):
-	jobs_list = []
-	score_results = {}
-	for job in jobs:
-		if job[PLAYER_NUM] == player and job[COLOR_NUM] == color and job[SKITTLES_NUM] == skittle and job[TASTE_MEAN] == mean:
-			jobs_list.append(job[JOB_ID])
-	for result in results:
-		if result[JOB_ID] in jobs_list:
-			if result[JOB_ID] not in score_results:
-				score_results[result[JOB_ID]] = 0
-			score_results[result[JOB_ID]] += result[SCORE]
+def getScores(skittles, color, player, mean):
+	score_results = defaultdict(int)
+	
+	cursor.execute("select job_id, player_num, score from result, jobs where player_num = "+str(player)+" and color_num = "+str(color)+" and skittles_num = "+str(skittles)+" and taste_mean = "+str(mean))
+	results_length = int(cursor.rawcount)
+	for i in xrange(0, results_length):
+	    job_id, player_num, score = cursor.fetchone()
+	    score_results[(job_id, player_num)] += score
+	
 	return score_results
 			
 def playersInJobId(job_id):
 	player_list = []
-	for result in results:
-		if result[JOB_ID] == job_id:
-			player_list.append(result[PLAYER_NAME])
+	cursor.execute("select player_name from result where job_id = "+str(job_id))
+	results_length = int(cursor.rawcount)
+	
+	for i in xrange(0, results_length):
+	    player_list.append(cursor.fetchone()[0])
+	
 	return player_list
 	
 def sortResults(toSort, reverse):
 	sorted_total_results = sorted(toSort.iteritems(), key=operator.itemgetter(1), reverse=reverse)
 	return sorted_total_results
 
-#Pairs Rankings
-def pairs(skittles, colors, num, mean):
-	data = []
-	ranking_dict = {}
-	score_results = sortResults(getScores(skittles, colors, num, mean), True)
-	for i, score in enumerate(score_results):
-		player_in_results = list(set(playersInJobId(score[0])))
-		data.append([score[0], score[1], player_in_results, i])
-		formated_players = replacePlayers(str(player_in_results))
-		if formated_players not in ranking_dict:
-			ranking_dict[formated_players] = 0
-		ranking_dict[formated_players] += float(score[1])			
-	return sortResults(ranking_dict, True)
+def getJobIds(skittles, colors, num, mean):
+    cursor.execute("select job_id from result, jobs where player_num = "+str(num)+" and color_num = "+str(colors)+" and skittles_num = "+str(skittles)+" and taste_mean = "+str(taste_mean))
+    results = []
+    results_length = int(cursor.rawcount)
+    for i in xrange(0, results_length):
+        results.append(cursor.fetchone()[0])
+    return results
 
-def print_pairs(pairs):
+#Pairs Rankings
+def groups(skittles, colors, num, mean):
+	#data = []
+	ranking_dict = defaultdict(int)
+	scores_for_players = {}
+	score_results = sortResults(getScores(skittles, colors, num, mean), True)
+	# get job ids for this config
+	job_ids = getJobIds(*args)
+	# get players for each job id
+	for job_id in job_ids:
+	    players = sorted(playersInJobId(job_id))
+	    scores = []
+	    # get scores for players
+	    for player in players:
+	        scores.append(score_results[(job_id, player)])
+	    scores_for_players[(set(players),)] = scores
+	     
+	return scores_for_players
+	
+	#for i, score in enumerate(score_results):
+	#	players_in_results = list(set(playersInJobId(score[0][0])))
+	#	#data.append([score[0], score[1], players_in_results, i])
+	#	formatted_players = replacePlayers(str(player_in_results))
+	#	
+	#	ranking_dict[formatted_players] += float(score[1])	
+	#return sortResults(ranking_dict, True)
+
+def print_groups(pairs):
 	for pair in pairs:
 		f.write(str(pair) + "\n")
 
-def all_pairs(num, mean):
+def all_groups(num, mean):
 	print "Another run"
 	f.write(str(num) + " players\n")
 	f.write("mean is " + str(mean) + "\n")
-	f.write("************************************\n")
-	f.write("Pairs with 1000, 20\n")
-	print_pairs(pairs(1000, 20, num, mean))
+	print_groups(groups(1000, 20, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 100, 3\n")
-	print_pairs(pairs(100, 3, num, mean))
+	print_groups(groups(100, 3, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 20, 2\n")
-	print_pairs(pairs(20, 2, num, mean))
+	print_groups(groups(20, 2, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 2, 4\n")
-	print_pairs(pairs(2, 4, num, mean))
+	print_groups(groups(2, 4, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 20, 4\n")
-	print_pairs(pairs(20, 4, num, mean))
+	print_groups(groups(20, 4, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 40, 20\n")
-	print_pairs(pairs(40, 20, num, mean))
+	print_groups(groups(40, 20, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 20, 20\n")
-	print_pairs(pairs(20, 20, num, mean))
+	print_groups(groups(20, 20, num, mean))
 	f.write("************************************\n")
 	f.write("Pairs with 50, 1\n")
-	print_pairs(pairs(50, 1, num, mean))
+	print_groups(groups(50, 1, num, mean))
 	f.write("************************************\n")
 
 def pairs_by_mean(mean):
-	all_pairs(2, mean)
-	all_pairs(3, mean)
-	all_pairs(5, mean)
-	all_pairs(7, mean)
+	all_groups(2, mean)
+	all_groups(3, mean)
+	all_groups(5, mean)
+	all_groups(7, mean)
 
 def full_print():
 	pairs_by_mean(0.01)

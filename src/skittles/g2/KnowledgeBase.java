@@ -66,7 +66,7 @@ public class KnowledgeBase {
 		for (int j = 0; j < playerCount; j++) {
 			this.estimatedCount[j] = new double[inventory.size()];
 			for (int i = 0; i < inventory.size(); i++) {
-				estimatedCount[j][i] = Math.max(avgCount * (getCoeffecient(inventory.size())), 0); //Empirically proven to give conservative estimate
+				estimatedCount[j][i] = Math.max(avgCount * (getCoefficient(inventory.size())), 0); //Empirically proven to give conservative estimate
 			}
 		}
 		this.turn = 0;
@@ -76,7 +76,7 @@ public class KnowledgeBase {
 		return (int) estimatedCount[player][color];
 	}
 	
-	public double getCoeffecient(int x) {
+	public double getCoefficient(int x) {
         // coefficients
         double a = 1.1023231527810862E+00;
         double b = 4.5624279968285669E-01;
